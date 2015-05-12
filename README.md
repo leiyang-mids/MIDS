@@ -1,3 +1,2 @@
 # MIDS
-UCB MIDS
-test
+UCB MIDS Course Repository
