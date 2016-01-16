@@ -1,0 +1,94 @@
+=====DATSCIW261 ASSIGNMENT #2=====
+
+MIDS UC Berkeley, Machine Learning at Scale
+DATSCIW261 ASSIGNMENT #2
+
+---------------
+=== INSTRUCTIONS for SUBMISSIONS ===
+Follow the instructions for submissions carefully.
+
+
+=== Week 2 ASSIGNMENTS using Hadoop Streaming and Python===
+
+HW2.0.
+What is a race condition in the context of parallel computation? Give an example.
+What is MapReduce?
+How does it differ from Hadoop?
+Which programming paradigm is Hadoop based on? Explain and give a simple example in code and show the code running.
+
+HW2.1. Sort in Hadoop MapReduce
+Given as input: Records of the form <integer, “NA”>, where integer is any integer, and “NA” is just the empty string.
+Output: sorted key value pairs of the form <integer, “NA”>; what happens if you have multiple reducers? Do you need additional steps? Explain.
+
+Write code to generate N  random records of the form <integer, “NA”>. Let N = 10,000.
+Write the python Hadoop streaming map-reduce job to perform this sort.
+
+
+
+HW2.2. Using the Enron data from HW1 and Hadoop MapReduce streaming, write mapper/reducer pair that  will determine the number of occurrences of a single, user-specified word. Examine the word “assistance” and report your results.
+
+
+   To do so, make sure that
+   
+   - mapper.py counts all occurrences of a single word, and
+   - reducer.py collates the counts of the single word.
+
+CROSSCHECK: >grep assistance enronemail_1h.txt|cut -d$'\t' -f4| grep assistance|wc -l
+       8
+
+HW2.3. Using the Enron data from HW1 and Hadoop MapReduce, write  a mapper/reducer pair that
+   will classify the email messages by a single, user-specified word. Examine the word “assistance” and report your results. To do so, make sure that
+   
+   - mapper.py
+   - reducer.py 
+
+   performs a single word multinomial Naive Bayes classification.
+
+HW2.4. Using the Enron data from HW1 and in the Hadoop MapReduce framework, write  a mapper/reducer pair that
+   will classify the email messages using multinomial Naive Bayes Classifier using a list of one or more user-specified words. Examine the words “assistance”, “valium”, and “enlargementWithATypo” and report your results
+   To do so, make sure that
+
+   - mapper.py 
+   - reducer.py 
+
+   performs the multiple-word multinomial Naive Bayes classification via the chosen list.
+
+HW2.5. Using the Enron data from HW1 an in the  Hadoop MapReduce framework, write  a mapper/reducer for a multinomial Naive Bayes Classifier that
+   will classify the email messages using  words present. Also drop words with a frequency of less than three (3). How does it affect the misclassifcation error of learnt naive multinomial Bayesian Classifiers on the training dataset:
+
+  
+In all cases you should apply a Laplace (add-1) smoothing to the classifier
+(always on the reducer side) to safeguard code against low-data.
+
+
+For a quick reference on the construction of the classifier that you will code,
+please consult the "Document Classification" section of the following wikipedia page:
+
+https://en.wikipedia.org/wiki/Naive_Bayes_classifier#Document_classification
+
+the original paper by our curators of the Enron email data:
+
+http://www.aueb.gr/users/ion/docs/ceas2006_paper.pdf
+
+
+=====Output=====
+
+In part (1), reducer.py should simply print out the word and its count (tab-delimited).
+
+In parts (2-4), reducer.py should print out the classification in the format:
+
+.
+.
+.
+ID (tab) TRUTH (tab) CLASS
+.
+.
+.
+
+where TRUTH is a binary value indicating SPAM or HAM (1 or 0, respectively),
+and CLASS is a binary value indicating your filter's classification (same coding).
+
+=====================
+END OF HOMEWORK
+
+

@@ -1,0 +1,110 @@
+=====DATSCIW261 ASSIGNMENT #3=====
+
+MIDS UC Berkeley, Machine Learning at Scale
+DATSCIW261 ASSIGNMENT #3
+
+=== Preliminary information ===
+
+Much of this homework will focus on the Apriori algorithm for frequent itemset mining.
+Please acquaint yourself with the background information (below)
+before approaching this week's coding assignments and relevant questions.
+
+=== Apriori background information ===
+
+Some background material for the  Apriori algorithm is located at:
+
+ - https://en.wikipedia.org/wiki/Apriori_algorithm
+ - https://www.dropbox.com/s/k2zm4otych279z2/Apriori-good-slides.pdf?dl=0
+ - http://snap.stanford.edu/class/cs246-2014/slides/02-assocrules.pdf
+
+Association Rules are frequently used for Market Basket Analysis (MBA) by retailers to
+understand the purchase behavior of their customers. This information can be then used for
+many different purposes such as cross-selling and up-selling of products, sales promotions,
+loyalty programs, store design, discount plans and many others.
+Evaluation of item sets: Once you have found the frequent itemsets of a dataset, you need
+to choose a subset of them as your recommendations. Commonly used metrics for measuring
+significance and interest for selecting rules for recommendations are: confidence; lift; and conviction.
+
+=== Week 3 ASSIGNMENTS ===
+
+HW3.0.
+What is a merge sort? Where is it used in Hadoop?
+How is  a combiner function in the context of Hadoop? 
+Give an example where it can be used and justify why it should be used in the context of this problem.
+What is the Hadoop shuffle?
+What is the Apriori algorithm? Describe an example use in your domain of expertise. Define confidence and lift.
+
+HW3.1. 
+Product Recommendations: The action or practice of selling additional products or services 
+to existing customers is called cross-selling. Giving product recommendation is 
+one of the examples of cross-selling that are frequently used by online retailers. 
+One simple method to give product recommendations is to recommend products that are frequently
+browsed together by the customers.
+
+Suppose we want to recommend new products to the customer based on the products they
+have already browsed on the online website. Write a program using the A-priori algorithm
+to find products which are frequently browsed together. Fix the support to s = 100 
+(i.e. product pairs need to occur together at least 100 times to be considered frequent) 
+and find itemsets of size 2 and 3.
+
+Use the online browsing behavior dataset at: 
+
+https://www.dropbox.com/s/zlfyiwa70poqg74/ProductPurchaseData.txt?dl=0
+
+Each line in this dataset represents a browsing session of a customer. 
+On each line, each string of 8 characters represents the id of an item browsed during that session. 
+The items are separated by spaces.
+
+Do some exploratory data analysis of this dataset. 
+Report your findings such as number of unique products; largest basket, etc. using Hadoop Map-Reduce.
+
+HW3.2. (Computationally prohibitive but then again Hadoop can handle this)
+
+Note: for this part the writeup will require a specific rule ordering but the program need not sort the output.
+
+List the top 5 rules with corresponding confidence scores in decreasing order of confidence score 
+for frequent (100>count) itemsets of size 2. 
+A rule is of the form: 
+
+(item1) ⇒ item2.
+
+Fix the ordering of the rule lexicographically (left to right), 
+and break ties in confidence (between rules, if any exist) 
+by taking the first ones in lexicographically increasing order. 
+Use Hadoop MapReduce to complete this part of the assignment; 
+use a single mapper and single reducer; use a combiner if you think it will help and justify. 
+
+
+HW3.3
+
+Benchmark your results using the pyFIM implementation of the Apriori algorithm
+(Apriori - Association Rule Induction / Frequent Item Set Mining implemented by Christian Borgelt). 
+You can download pyFIM from here: 
+
+http://www.borgelt.net/pyfim.html
+
+Comment on the results from both implementations (your Hadoop MapReduce of apriori versus pyFIM) 
+in terms of results and execution times.
+
+
+HW3.4 (Conceptual Exercise)
+
+Suppose that you wished to perform the Apriori algorithm once again,
+though this time now with the goal of listing the top 5 rules with corresponding confidence scores 
+in decreasing order of confidence score for itemsets of size 3 using Hadoop MapReduce.
+A rule is now of the form: 
+
+(item1, item2) ⇒ item3 
+
+Recall that the Apriori algorithm is iterative for increasing itemset size,
+working off of the frequent itemsets of the previous size to explore 
+ONLY the NECESSARY subset of a large combinatorial space. 
+Describe how you might design a framework to perform this exercise.
+
+In particular, focus on the following:
+  — map-reduce steps required
+  - enumeration of item sets and filtering for frequent candidates
+
+
+END OF HOMEWORK
+===============

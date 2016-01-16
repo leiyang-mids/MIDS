@@ -1,0 +1,26 @@
+MIDS UC Berkeley Machine Learning at Scale
+Dr James G. Shanahan
+
+-- Guidelines for Homework and Exercise Submissions 
+
+**: For this homework, submit solutions for the following assignments in the form of an iPython notebook. Provide a link that will launch an iPython Viewer. For an example, instead of providing a link to the notebook directly dl.dropbox.com/s/07kft84yvk1aumb/DivideAndConquer1-commands.ipynb, replace this with the following nbviewer type link (test that you can view the notebook on your browser) and submit: http://nbviewer.ipython.org/urls/dl.dropbox.com/s/07kft84yvk1aumb/Divide...).
+
+** Don’t forget to use markup such as bold, italics, equations, font size etc. For more info click here for cool notebook markups.
+
+** Don’t forget to put your name, email, Class Name, Week Number, and date of submission on each report.
+
+** Please name files as follows: MIDS-W261-2015-HWK-Week01-StudentLastName.ipynb, .doc, .pdf etc..
+
+** For code responses please create a separate driver function for each exercise or exercise part (and comment!) E.g., 
+def hw1_0: 
+   your code goes here
+
+In the next cell show your code running
+hw1_0();
+…… show the code running with a sample output
+
+** Please submit a PDF version of your solution also. Remember to include the assignment number and task description as the beginning of each solution part.
+
+** 30% of the homework part of your grade will go to presentation format, language and style! As a data scientist, clear communication is key!
+
+** If you have questions about homework assignments or any aspect of the course please raise them during our live sessions or post them on the course noticeboard (posts and student responses or lack of will be graded). Please use the STAR format for questions and responses (For more information on the STAR format see https://en.wikipedia.org/wiki/Situation,_Task,_Action,_Result.).

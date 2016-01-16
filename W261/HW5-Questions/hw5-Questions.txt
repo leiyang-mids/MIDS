@@ -1,0 +1,171 @@
+=====DATSCIW261 ASSIGNMENT #5=====
+
+MIDS UC Berkeley, Machine Learning at Scale
+DATSCIW261 ASSIGNMENT #5
+
+---------------
+=== INSTRUCTIONS for SUBMISSIONS ===
+Please follow the instructions for submissions carefully.
+
+=== Week 5 ASSIGNMENTS ===
+
+HW 5.0
+What is a data warehouse? What is a Star schema? When is it used?
+--
+
+HW 5.1
+In the database world What is 3NF? Does machine learning use data in 3NF? If so why? 
+In what form does ML consume data?
+Why would one use log files that are denormalized?
+--
+
+HW 5.2
+Using MRJob, implement a hashside join (memory-backed map-side) for left, 
+right and inner joins. Run your code on the  data used in HW 4.4: (Recall HW 4.4: Find the most frequent visitor of each page using mrjob and the output of 4.2  (i.e., transfromed log file). In this output please include the webpage URL, webpageID and Visitor ID.)
+:
+
+Justify which table you chose as the Left table in this hashside join.
+
+Please report the number of rows resulting from:
+
+(1) Left joining Table Left with Table Right
+(2) Right joining Table Left with Table Right
+(3) Inner joining Table Left with Table Right
+--
+
+HW 5.3 For the remainder of this assignment you will work with a large subset 
+of the Google n-grams dataset,
+
+https://aws.amazon.com/datasets/google-books-ngrams/
+
+which we have placed in a bucket on s3:
+
+s3://filtered-5grams/
+
+In particular, this bucket contains (~200) files in the format:
+
+	(ngram) \t (count) \t (pages_count) \t (books_count)
+
+Do some EDA on this dataset using mrjob, e.g., 
+
+- Longest 5-gram (number of characters)
+- Top 10 most frequent words (count), i.e., unigrams
+- Most/Least densely appearing words (count/pages_count) sorted in decreasing order of relative frequency (Hint: save to PART-000* and take the head -n 1000)
+- Distribution of 5-gram sizes (counts) sorted in decreasing order of relative frequency. (Hint: save to PART-000* and take the head -n 1000)
+OPTIONAL Question:
+- Plot the log-log plot of the frequency distributuion of unigrams. Does it follow power law distribution?
+
+For more background see:
+https://en.wikipedia.org/wiki/Log%E2%80%93log_plot
+https://en.wikipedia.org/wiki/Power_law
+--
+
+HW 5.4  (over 2Gig of Data)
+In this part of the assignment we will focus on developing methods
+for detecting synonyms, using the Google 5-grams dataset. To accomplish
+this you must script two main tasks using MRJob:
+
+(1) Build stripes of word co-ocurrence for the top 10,000 using the words ranked from 9001,-10,000 as a basis
+most frequently appearing words across the entire set of 5-grams,
+and output to a file in your bucket on s3 (bigram analysis, though the words are non-contiguous).
+
+(2) Using two (symmetric) comparison methods of your choice 
+(e.g., correlations, distances, similarities), pairwise compare 
+all stripes (vectors), and output to a file in your bucket on s3.
+
+==Design notes for (1)==
+For this task you will be able to modify the pattern we used in HW 3.2
+(feel free to use the solution as reference). To total the word counts 
+across the 5-grams, output the support from the mappers using the total 
+order inversion pattern:
+
+<*word,count>
+
+to ensure that the support arrives before the cooccurrences.
+
+In addition to ensuring the determination of the total word counts,
+the mapper must also output co-occurrence counts for the pairs of
+words inside of each 5-gram. Treat these words as a basket,
+as we have in HW 3, but count all stripes or pairs in both orders,
+i.e., count both orderings: (word1,word2), and (word2,word1), to preserve
+symmetry in our output for (2).
+
+==Design notes for (2)==
+For this task you will have to determine a method of comparison.
+Here are a few that you might consider:
+
+- Jaccard
+- Spearman correlation
+- Euclidean distance
+- Taxicab (Manhattan) distance
+- Shortest path graph distance (a graph, because our data is symmetric!)
+- Pearson correlation
+- Cosine similarity
+- Kendall correlation
+...
+
+However, be cautioned that some comparison methods are more difficult to
+parallelize than others, and do not perform more associations than is necessary, 
+since your choice of association will be symmetric.
+
+Please use the inverted index (discussed in live session #6) based pattern to compute the pairwise (term-by-term) similarity matrix. 
+
+HW 5.5
+In this part of the assignment you will evaluate the success of you synonym detector.
+Take the top 1,000 closest/most similar/correlative pairs of words as determined
+by your measure in (2), and use the synonyms function in the accompanying
+python code:
+
+nltk_synonyms.py
+
+Note: This will require installing the python nltk package:
+
+http://www.nltk.org/install.html
+
+and downloading its data with nltk.download().
+
+For each (word1,word2) pair, check to see if word1 is in the list, 
+synonyms(word2), and vice-versa. If one of the two is a synonym of the other, 
+then consider this pair a 'hit', and then report the precision, recall, and F1 measure  of 
+your detector across your 1,000 best guesses. Report the macro averages of these measures.
+
+
+--
+
+HW 5.5.1 (optional)
+There is also a corpus of stopwords, that is, high-frequency words like "the", "to" and "also" that we sometimes want to filter out of a document before further processing. Stopwords usually have little lexical content, and their presence in a text fails to distinguish it from other texts. Python's nltk comes with a prebuilt list of stopwords (see below). Using this stopword list filter out these tokens from your analysis and rerun the experiments in 5.5 and disucuss the results of using a stopword list and without using a stopword list.
+
+>> from nltk.corpus import stopwords
+>>> stopwords.words('english')
+['i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 'your', 'yours',
+'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 'she', 'her', 'hers',
+'herself', 'it', 'its', 'itself', 'they', 'them', 'their', 'theirs', 'themselves',
+'what', 'which', 'who', 'whom', 'this', 'that', 'these', 'those', 'am', 'is', 'are',
+'was', 'were', 'be', 'been', 'being', 'have', 'has', 'had', 'having', 'do', 'does',
+'did', 'doing', 'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until',
+'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 'into',
+'through', 'during', 'before', 'after', 'above', 'below', 'to', 'from', 'up', 'down',
+'in', 'out', 'on', 'off', 'over', 'under', 'again', 'further', 'then', 'once', 'here',
+'there', 'when', 'where', 'why', 'how', 'all', 'any', 'both', 'each', 'few', 'more',
+'most', 'other', 'some', 'such', 'no', 'nor', 'not', 'only', 'own', 'same', 'so',
+'than', 'too', 'very', 's', 't', 'can', 'will', 'just', 'don', 'should', 'now']
+
+HW 5.6 (optional)
+There are many good ways to build our synonym detectors, so for optional homework, 
+measure co-occurrence by (left/right/all) consecutive words only, 
+or make stripes according to word co-occurrences with the accompanying 
+2-, 3-, or 4-grams (note here that your output will no longer 
+be interpretable as a network) inside of the 5-grams.
+--
+
+Hw 5.7 (optional)
+Once again, benchmark your top 10,000 associations (as in 5.5), this time for your
+results from 5.6. Has your detector improved?
+
+Hw 5.7 (optional)
+
+--
+
+=====================
+END OF ASSIGNMENT #5
+=====================
