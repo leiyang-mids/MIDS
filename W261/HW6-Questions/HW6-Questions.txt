@@ -1,0 +1,67 @@
+=====DATSCIW261 ASSIGNMENT #6=====
+
+Live as  of October 13, 2015 Midday
+
+MIDS UC Berkeley, Machine Learning at Scale
+DATSCIW261 ASSIGNMENT #6
+
+NOTE This homework is an individual homework!
+
+---------------
+=== INSTRUCTIONS for SUBMISSIONS ===
+Please follow the instructions for submissions carefully.
+
+=== Week 6 ASSIGNMENTS ===
+
+HW6.0. 
+In mathematics, computer science, economics, or management science what is mathematical optimization? Give an example of a optimization problem that you have worked with directly or that your organization has worked on. Please describe the objective function and the decision variables. Was the project successful (deployed in the real world)? Describe.
+
+HW6.1 
+Optimization theory: 
+For unconstrained univariate optimization what are the first order  Necessary Conditions for Optimality (FOC).  What are the second order optimality conditions (SOC)? Give a mathematical defintion. Also in python, plot the univartiate function 
+X^3 -12x^2-6 defined over the real  domain -6 to +6. 
+
+Also plot its corresponding first and second derivative functions. Eyeballing these graphs, identify candidate optimal points and then classify them as local minimums or maximums. Highlight and label these points in your graphs. Justify your responses using the FOC and SOC.
+
+For unconstrained multi-variate optimization what are the first order  Necessary Conditions for Optimality (FOC).  What are the second order optimality conditions (SOC)? Give a mathematical defintion. What is the Hessian matrix in this context?
+
+HW6.2
+Taking x=1 as the first approximation(xt1) of a root of X^3 + 2x -4 = 0, use the Newton-Raphson method to calculate the second approximation (denoted as xt2) of this root. (Hint the solution is xt2=1.2)
+
+
+HW6.3 Convex optimization 
+What makes an optimization problem convex? What are the first order  Necessary Conditions for Optimality in convex optimization.  What are the second order optimality conditions for convex optimization? Are both necessary to determine the maximum or minimum of candidate optimal solutions?
+
+Fill in the BLANKS here:
+Convex minimization, a subfield of optimization, studies the problem of minimizing BLANK functions over BLANK sets. The BLANK property can make optimization in some sense "easier" than the general case - for example, any local minimum must be a global minimum.
+
+HW 6.4
+The learning objective function for weighted ordinary least squares (WOLS) (aka weight linear regression) is defined as follows:
+
+0.5* sumOverTrainingExample i (weight_i * (W * X_i - y_i)^2)
+
+Where training set consists of input variables X ( in vector form) and a target variable y, and W is the vector of coefficients for the linear regression model.
+
+Derive the gradient for this weighted OLS by hand; showing each step and also explaining each step.
+
+HW 6.5
+Write a MapReduce job in MRJob to do the training at scale of a weighted OLS model using gradient descent.
+
+Generate one million datapoints just like in the following notebook:  http://nbviewer.ipython.org/urls/dl.dropbox.com/s/kritdm3mo1daolj/MrJobLinearRegressionGD.ipynb
+
+Weight each example as follows: 
+
+weight(x)= abs(1/x)
+
+Sample 1% of the data in MapReduce and use the sampled dataset to train a (weighted if available in SciKit-Learn) linear regression model locally using  SciKit-Learn (http://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LinearRegression.html)
+
+Plot the resulting weighted linear regression model versus the original model that you used to generate the data. Comment on your findings.
+
+HW6.5.1 (Optional)
+Using MRJob and in Python, plot the error surface for the weighted linear regression model using a heatmap and contour plot. 
+Also plot the current model in the original domain space.  (Plot them side by side if possible)
+Plot the path to convergence (during training) for the weighted linear regression model in plot error space and in the original domain space. Make sure to label your plots with iteration numbers, function, model space versus original domain space, etc.
+Comment on convergence and on the mean squared error using your weighted OLS algorithm on the weighted dataset versus using the weighted OLS algorithm on the uniformly weighted dataset.
+
+
+
