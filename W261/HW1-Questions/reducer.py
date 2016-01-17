@@ -51,8 +51,8 @@ p_n = 1.0*nNormal/(nSpam+nNormal)
 #### conditional probabilities for words ####
 p_word_s, p_word_n = {}, {}
 for word in allwords:
-    p_word_s[word] = 1.0*((s_count[word] if word in s_count else 0) + 1) / (tot_s + B)
-    p_word_n[word] = 1.0*((n_count[word] if word in n_count else 0) + 1) / (tot_n + B)
+    p_word_s[word] = 1.0*((s_count[word] if word in s_count else 0) + .1) / (tot_s + B) #Laplace add 1 smoothing
+    p_word_n[word] = 1.0*((n_count[word] if word in n_count else 0) + .1) / (tot_n + B)
 
 # finally we classify the messages which contains the specified word
 #### we won't print model parameters, to save some space ####
