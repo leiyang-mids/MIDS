@@ -56,13 +56,6 @@ for word in allwords:
 
 # finally we classify the messages which contains the specified word
 #### we won't print model parameters, to save some space ####
-#print '\n============= Model Parameters ============='
-#print 'P(spam) = %f' %(p_s)
-#print 'P(non-spam) = %f' %(p_n)
-#for word in keywords:
-#    print 'P(%s|spam) = %f' %(word, p_word_s[word])
-#    print 'P(%s|non-spam) = %f' %(word, p_word_n[word])
-
 #### likelihood: dependend on the frequency of current word ####
 print '\n============= Classification Results ============='
 print 'TRUTH \t CLASS \t ID'
@@ -86,4 +79,4 @@ with open (testfile, "r") as myfile:
         # print results
         print ('spam' if int(msg[1]) else 'ham') + '\t' + ('spam' if isSpam else 'ham') + '\t' + msg[0]
 
-print '\nClassification rate: %f' %(1.0*n_correct/(nSpam+nNormal))
+print '\nOur multinomial NB training error: %f' %(1-1.0*n_correct/(nSpam+nNormal))

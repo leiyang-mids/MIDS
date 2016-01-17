@@ -103,4 +103,4 @@ ham	spam	0018.1999-12-14.kaminski
 spam	spam	0018.2001-07-13.sa_and_hp
 spam	spam	0018.2003-12-18.gp
 
-Classification rate: 0.970000
+Our multinomial NB training error: 0.030000
