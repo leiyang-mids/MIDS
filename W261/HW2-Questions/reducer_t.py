@@ -4,7 +4,7 @@ import sys, operator
 import numpy as np
 
 current_word = None
-smooth_factor = 0 # no smoothing
+smooth_factor = 1.0 # no smoothing
 current_count = [smooth_factor, smooth_factor]
 word = None
 wordcount = {}
@@ -45,8 +45,8 @@ if current_word == word:
     
 # calculate NB parameters, and write the dictionary to a file for the classification job
 n_total = np.sum(wordcount.values(), 0)
-#print 'total count %s' %(str(n_total))
-
-#print probability
+# print probability
 for (key,value) in zip(wordcount.keys(), wordcount.values()/(1.0*n_total)):
-    print '%s\t%s\t%s' %(key, value[0], value[1])
+    # only emit probability when the count (spam and ham together) is no less than 3
+    if sum(wordcount[key]) >= 3:
+        print '%s\t%s\t%s' %(key, value[0], value[1])
