@@ -4,7 +4,7 @@ import sys, operator
 import numpy as np
 
 current_word = None
-smooth_factor = 0.1 # Laplace plus-one smoothing
+smooth_factor = 0 # no smoothing
 current_count = [smooth_factor, smooth_factor]
 word = None
 wordcount = {}
@@ -45,6 +45,8 @@ if current_word == word:
     
 # calculate NB parameters, and write the dictionary to a file for the classification job
 n_total = np.sum(wordcount.values(), 0)
-# print probability
+#print 'total count %s' %(str(n_total))
+#probability = {key:value for (key,value) in zip(wordcount.keys(), wordcount.values()/(1.0*n_total))}
+#print probability
 for (key,value) in zip(wordcount.keys(), wordcount.values()/(1.0*n_total)):
     print '%s\t%s\t%s' %(key, value[0], value[1])

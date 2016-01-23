@@ -27,5 +27,5 @@ for line in sys.stdin:
         # what we output here will be the input for the
         # Reduce step, i.e. the input for reducer.py
         #
-        # tab-delimited; the trivial word count is 1
+        # tab-delimited; the trivial word count is 1        
         print '%s\t%s\t%s\t%s' % (msgID, prob[word][0], prob[word][1], isSpam)
