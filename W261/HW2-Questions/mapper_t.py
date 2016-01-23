@@ -10,7 +10,7 @@ for line in sys.stdin:
         continue
     isSpam = msg[1]
     # remove punctuations, only have white-space as delimiter
-    words = regex.sub('', msg[-1].lower())
+    words = regex.sub(' ', msg[-1].lower())
     # split the line into words
     words = words.split()
     # increase counters

@@ -14,6 +14,7 @@ prio = [0, 0] # [math.log(.56), math.log(.44)]
 print '%s\t%s\t%s' %('TRUTH', 'PREDICTION', 'EMAIL ID')
 # input comes from STDIN
 for line in sys.stdin:
+    print line
     # remove leading and trailing whitespace
     line = line.strip()
 

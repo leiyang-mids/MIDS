@@ -18,7 +18,7 @@ for line in sys.stdin:
         continue
     msgID, isSpam = msg[0], msg[1]    
     # remove punctuations, only have white-space as delimiter
-    words = regex.sub('', msg[-1].lower())
+    words = regex.sub(' ', msg[-1].lower())
     # split the line into words
     words = words.split()
     # increase counters
@@ -28,4 +28,5 @@ for line in sys.stdin:
         # Reduce step, i.e. the input for reducer.py
         #
         # tab-delimited; the trivial word count is 1        
-        print '%s\t%s\t%s\t%s' % (msgID, prob[word][0], prob[word][1], isSpam)
+        if True: # float(prob[word][0])>0 and float(prob[word][1])>0:
+            print '%s\t%s\t%s\t%s' % (msgID, prob[word][0], prob[word][1], isSpam)

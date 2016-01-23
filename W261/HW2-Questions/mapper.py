@@ -7,7 +7,7 @@ for line in sys.stdin:
     # use subject and body
     line = line.split('\t', 2)[-1]
     # remove punctuations, only have white-space as delimiter
-    line = regex.sub('', line.lower())
+    line = regex.sub(' ', line.lower())
     # split the line into words
     words = line.split()
     # increase counters

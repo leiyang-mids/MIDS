@@ -46,7 +46,7 @@ if current_word == word:
 # calculate NB parameters, and write the dictionary to a file for the classification job
 n_total = np.sum(wordcount.values(), 0)
 #print 'total count %s' %(str(n_total))
-#probability = {key:value for (key,value) in zip(wordcount.keys(), wordcount.values()/(1.0*n_total))}
+
 #print probability
 for (key,value) in zip(wordcount.keys(), wordcount.values()/(1.0*n_total)):
     print '%s\t%s\t%s' %(key, value[0], value[1])
