@@ -4,7 +4,8 @@ import sys, operator
 import numpy as np
 
 current_word = None
-current_count = [0, 0]
+smooth_factor = 0 # no smoothing
+current_count = [smooth_factor, smooth_factor]
 word = None
 wordcount = {}
 
@@ -45,4 +46,6 @@ if current_word == word:
 # calculate NB parameters, and write the dictionary to a file for the classification job
 n_total = np.sum(wordcount.values(), 0)
 probability = {key:value for (key,value) in zip(wordcount.keys(), wordcount.values()/(1.0*n_total))}
-print probability
+#print probability
+for key in probability:
+    print '%s\t%s\t%s' %(key, probability[key][0], probability[key][1])

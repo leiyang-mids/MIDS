@@ -40,7 +40,7 @@ if current_word == word:
     
 # sort count top get top n counts:
 n = 10
-wordcount = sorted(wordcount.items(), key=operator.itemgetter(1))
-print 'Top %d counts out of %d words:' %(n, len(wordcount))
+sort_count = sorted(wordcount.items(), key=operator.itemgetter(1))
+print 'Top %d counts out of %d words:' %(n, len(sort_count))
 for i in range(n):
-    print '%s\t%d' %(wordcount[-i-1])
+    print '%s\t%d' %(sort_count[-i-1])
