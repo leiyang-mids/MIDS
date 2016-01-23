@@ -9,9 +9,9 @@ msgID = None
 n_error = 0
 n_msg = 0
 n_zero = [0, 0]
-prio = [math.log(.56), math.log(.44)]
+prio = [0, 0] # [math.log(.56), math.log(.44)]
 
-print '%s\t%s\t%s' %('TRUTH', 'PREDICTION', 'MEG ID')
+print '%s\t%s\t%s' %('TRUTH', 'PREDICTION', 'EMAIL ID')
 # input comes from STDIN
 for line in sys.stdin:
     # remove leading and trailing whitespace
@@ -40,7 +40,7 @@ for line in sys.stdin:
             n_error += pred != isSpam
             n_msg += 1
             n_zero[isSpam] += float('-inf') in current_prob
-            print '%s\t%s\t%s' %(isSpam, pred, msgID)
+            print '%s\t%s\t%s\t%s' %(isSpam, pred, str(current_prob), msgID)
             
         # initialize new count for new word
         current_prob = np.sum([[math.log(x) if x>0 else float('-inf') for x in prob], prio], 0)
@@ -51,7 +51,8 @@ if current_msg == msgID:
     pred = np.argmax(current_prob)
     n_error += pred != isSpam
     n_msg += 1
-    print '%s\t%s\t%s' %(isSpam, pred, msgID)
+    n_zero[isSpam] += float('-inf') in current_prob
+    print '%s\t%s\t%s\t%s' %(isSpam, pred, str(current_prob), msgID)
     
 # calculate the overall error rate
 print 'Error rate: %.4f' %(1.0*n_error/n_msg)

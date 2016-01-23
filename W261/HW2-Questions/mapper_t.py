@@ -6,7 +6,7 @@ regex = re.compile('[%s]' % re.escape(string.punctuation))
 for line in sys.stdin:
     # use subject and body
     msg = line.split('\t', 2)
-    if len(msg)<3:
+    if len(msg) < 3:
         continue
     isSpam = msg[1]
     # remove punctuations, only have white-space as delimiter

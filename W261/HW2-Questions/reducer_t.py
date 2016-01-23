@@ -4,7 +4,7 @@ import sys, operator
 import numpy as np
 
 current_word = None
-smooth_factor = 0 # no smoothing
+smooth_factor = 0.1 # Laplace plus-one smoothing
 current_count = [smooth_factor, smooth_factor]
 word = None
 wordcount = {}
@@ -35,7 +35,7 @@ for line in sys.stdin:
             # count finish for one word, save it
             wordcount[current_word] = current_count
         # initialize new count for new word
-        current_count = [0, 0]
+        current_count = [smooth_factor, smooth_factor]
         current_count[isSpam] = count
         current_word = word
 
@@ -45,7 +45,6 @@ if current_word == word:
     
 # calculate NB parameters, and write the dictionary to a file for the classification job
 n_total = np.sum(wordcount.values(), 0)
-probability = {key:value for (key,value) in zip(wordcount.keys(), wordcount.values()/(1.0*n_total))}
-#print probability
-for key in probability:
-    print '%s\t%s\t%s' %(key, probability[key][0], probability[key][1])
+# print probability
+for (key,value) in zip(wordcount.keys(), wordcount.values()/(1.0*n_total)):
+    print '%s\t%s\t%s' %(key, value[0], value[1])

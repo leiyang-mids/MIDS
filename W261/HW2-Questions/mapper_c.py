@@ -2,10 +2,10 @@
 import sys, re, string, subprocess
 # read the probability from HDFS
 prob = {}
-cat = subprocess.Popen(["hadoop", "fs", "-cat", "/user/leiyang/prob/part-00000"], stdout=subprocess.PIPE)
+cat = subprocess.Popen(["hadoop", "fs", "-cat", "prob/part-00000"], stdout=subprocess.PIPE)
 for line in cat.stdout:
     word, p0, p1 = line.split()
-    prob[word] = [float(p0), float(p1)]
+    prob[word] = [p0, p1]
 
 # define regex for punctuation removal
 regex = re.compile('[%s]' % re.escape(string.punctuation))
