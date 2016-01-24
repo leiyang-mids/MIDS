@@ -4,16 +4,18 @@ import sys, operator
 import numpy as np
 
 current_word = None
-smooth_factor = 0 # no smoothing
+smooth_factor = 1 # no smoothing
 current_count = [smooth_factor, smooth_factor]
 msgIDs = {}
 word = None
 wordcount = {}
 
 # input comes from STDIN
-for line in sys.stdin:
+for line in sys.stdin:    
     # remove leading and trailing whitespace
     line = line.strip()
+    #print line
+    #continue
 
     # parse the input we got from mapper.py
     word, count, isSpam, msgID = line.split('\t', 3)
@@ -59,6 +61,5 @@ print '%s\t%s\t%s' %('prior_prob', 1.0*n_ham/n_msg, 1.0*n_spam/n_msg)
 # conditional probability
 n_total = np.sum(wordcount.values(), 0)
 for (key,value) in zip(wordcount.keys(), wordcount.values()/(1.0*n_total)):
-    # only emit probability when the count (spam and ham together) is no less than 3
-    if sum(wordcount[key]) >= 3:
+    if wordcount[key] >= 3:
         print '%s\t%s\t%s' %(key, value[0], value[1])

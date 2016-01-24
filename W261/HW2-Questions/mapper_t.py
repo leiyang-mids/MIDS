@@ -4,6 +4,7 @@ import sys, re, string
 regex = re.compile('[%s]' % re.escape(string.punctuation))
 # input comes from STDIN (standard input)
 for line in sys.stdin:
+    line = line.strip()
     # use subject and body
     msg = line.split('\t', 2)
     if len(msg) < 3:
@@ -21,4 +22,4 @@ for line in sys.stdin:
         # Reduce step, i.e. the input for reducer.py
         #
         # tab-delimited; the trivial word count is 1
-        print '%s\t%d\t%s\t%s' % (word, 1, isSpam, msgID)
+        print '%s\t%d\t%s\t%s' % (word, 1, isSpam, msgID)        

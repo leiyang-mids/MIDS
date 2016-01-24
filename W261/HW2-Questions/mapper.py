@@ -5,8 +5,9 @@ for line in sys.stdin:
     if len(parts) == 0:
         continue
     try:
-        temp = int(parts[0])
+        key = int(parts[0])
     except ValueError:
         continue
-        
-    print "%s\t%s" %(parts[0], line.strip('\n'))
+    
+    # use integer as the key, and the entire record is value emitted by the mapper
+    print "%d\t%s" %(key, line.strip())

@@ -13,8 +13,7 @@ n_zero = [0, 0]
 
 print '%s\t%s\t%s' %('TRUTH', 'PREDICTION', 'EMAIL ID')
 # input comes from STDIN
-for line in sys.stdin:
-    #print line
+for line in sys.stdin:    
     # remove leading and trailing whitespace
     line = line.strip()
 
