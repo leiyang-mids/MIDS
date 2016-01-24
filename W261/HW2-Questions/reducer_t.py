@@ -59,4 +59,6 @@ print '%s\t%s\t%s' %('prior_prob', 1.0*n_ham/n_msg, 1.0*n_spam/n_msg)
 # conditional probability
 n_total = np.sum(wordcount.values(), 0)
 for (key,value) in zip(wordcount.keys(), wordcount.values()/(1.0*n_total)):
-    print '%s\t%s\t%s' %(key, value[0], value[1])
+    # only emit probability when the count (spam and ham together) is no less than 3
+    if sum(wordcount[key]) >= 3:
+        print '%s\t%s\t%s' %(key, value[0], value[1])
