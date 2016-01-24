@@ -10,7 +10,6 @@ msgID = None
 n_error = 0
 n_msg = 0
 n_zero = [0, 0]
-prio = [0, 0] #[math.log(.56), math.log(.44)]
 
 print '%s\t%s\t%s' %('TRUTH', 'PREDICTION', 'EMAIL ID')
 # input comes from STDIN
@@ -20,7 +19,7 @@ for line in sys.stdin:
     line = line.strip()
 
     # parse the input we got from mapper_c.py
-    msgID, p0, p1, isSpam = line.split('\t', 3)
+    msgID, p0, p1, isSpam, pr0, pr1 = line.split('\t')
     prob = [float(p0), float(p1)]
     
     # convert count and spam flag (currently a string) to int
@@ -45,7 +44,8 @@ for line in sys.stdin:
             print '%s\t%s\t%s' %(current_truth, pred, current_msg)
                     
         # initialize new count for new word
-        current_prob = np.sum([[math.log(x) if x>0 else float('-inf') for x in prob], prio], 0)
+        prior = [math.log(float(pr0)), math.log(float(pr1))]
+        current_prob = np.sum([[math.log(x) if x>0 else float('-inf') for x in prob], prior], 0)
         current_msg = msgID
         current_truth = isSpam
 

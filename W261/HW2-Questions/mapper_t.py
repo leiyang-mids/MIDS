@@ -8,7 +8,8 @@ for line in sys.stdin:
     msg = line.split('\t', 2)
     if len(msg) < 3:
         continue
-    isSpam = msg[1]
+    msgID, isSpam = msg[0], msg[1]
+    
     # remove punctuations, only have white-space as delimiter
     words = regex.sub(' ', msg[-1].lower())
     # split the line into words
@@ -20,4 +21,4 @@ for line in sys.stdin:
         # Reduce step, i.e. the input for reducer.py
         #
         # tab-delimited; the trivial word count is 1
-        print '%s\t%d\t%s' % (word, 1, isSpam)
+        print '%s\t%d\t%s\t%s' % (word, 1, isSpam, msgID)

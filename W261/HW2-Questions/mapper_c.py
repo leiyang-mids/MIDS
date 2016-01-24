@@ -3,9 +3,12 @@ import sys, re, string, subprocess
 # read the probability from HDFS
 prob = {}
 cat = subprocess.Popen(["hadoop", "fs", "-cat", "prob/part-00000"], stdout=subprocess.PIPE)
-for line in cat.stdout:
+for line in cat.stdout:    
     word, p0, p1 = line.split()
     prob[word] = [p0, p1]
+
+# get prior probability
+prior = prob['prior_prob']
 
 # define regex for punctuation removal
 regex = re.compile('[%s]' % re.escape(string.punctuation))
@@ -27,6 +30,5 @@ for line in sys.stdin:
         # what we output here will be the input for the
         # Reduce step, i.e. the input for reducer.py
         #
-        # tab-delimited; the trivial word count is 1
-        if word in prob:
-            print '%s\t%s\t%s\t%s' % (msgID, prob[word][0], prob[word][1], isSpam)
+        # tab-delimited; the trivial word count is 1                
+        print '%s\t%s\t%s\t%s\t%s\t%s' % (msgID, prob[word][0], prob[word][1], isSpam, prior[0], prior[1])
