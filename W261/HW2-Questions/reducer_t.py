@@ -14,9 +14,7 @@ wordcount = {}
 for line in sys.stdin:    
     # remove leading and trailing whitespace
     line = line.strip()
-    #print line
-    #continue
-
+    
     # parse the input we got from mapper.py
     word, count, isSpam, msgID = line.split('\t', 3)
 
