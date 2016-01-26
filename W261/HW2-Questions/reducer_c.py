@@ -58,4 +58,4 @@ if current_msg == msgID:
     
 # calculate the overall error rate
 print 'Error rate: %.4f' %(1.0*n_error/n_msg)
-print 'Number of zero probability: spam(%d), ham(%d)' %(n_zero[1], n_zero[0])
+print 'Number of messages with zero probability: spam(%d), ham(%d)' %(n_zero[1], n_zero[0])
