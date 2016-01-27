@@ -1,4 +1,4 @@
-=====DATSCIW261 ASSIGNMENT #2=====
+=====DATSCIW261 ASSIGNMENT #2========
 
 MIDS UC Berkeley, Machine Learning at Scale
 DATSCIW261 ASSIGNMENT #2
