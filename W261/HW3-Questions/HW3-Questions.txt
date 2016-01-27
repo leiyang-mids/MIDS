@@ -27,12 +27,23 @@ significance and interest for selecting rules for recommendations are: confidenc
 
 === Week 3 ASSIGNMENTS ===
 
-HW3.0.
-What is a merge sort? Where is it used in Hadoop?
-How is  a combiner function in the context of Hadoop? 
-Give an example where it can be used and justify why it should be used in the context of this problem.
-What is the Hadoop shuffle?
-What is the Apriori algorithm? Describe an example use in your domain of expertise. Define confidence and lift.
+###HW3.0.
+####What is a merge sort? Where is it used in Hadoop?
+Merge sort is to merge two sorted lists into one sorted list. 
+It's used in the shuffling stage of Hadoop where key-value pairs from different mappers are merged into one before hand over to the reducer
+
+####How is  a combiner function in the context of Hadoop? 
+Combiner is a local aggregation mechanism, where during each mapper process, aggregation is done to collapse key-value earlier and send intermediate results to the reducer.
+The operation that can combiner is applicable must be associative and communicative. 
+
+####Give an example where it can be used and justify why it should be used in the context of this problem.
+In word count for long articles. Combiner can be applied within each mapper when processing on a node. 
+In this way, the number of key-value pairs is dramatically reduced before they are sent to the reducer. Consequently the network communication is reduced as well.
+
+####What is the Hadoop shuffle?
+Shuffle happens after all mapper processes complete and before reducer starts, all key-value pairs are sorted by key, and the same key is guaranteed to be delivered to the same reducer.
+
+####What is the Apriori algorithm? Describe an example use in your domain of expertise. Define confidence and lift.
 
 HW3.1. 
 Product Recommendations: The action or practice of selling additional products or services 
