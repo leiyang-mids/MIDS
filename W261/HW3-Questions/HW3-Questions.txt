@@ -4,25 +4,38 @@ MIDS UC Berkeley, Machine Learning at Scale
 DATSCIW261 ASSIGNMENT #3
 
 Version 2016-01-27
-UNDER CONSTRUCTION please do not use
-
 
 === Week 3 ASSIGNMENTS ===
 
-HW3.0.
-What is a merge sort? Where is it used in Hadoop?
-How is  a combiner function in the context of Hadoop? 
-Give an example where it can be used and justify why it should be used in the context of this problem.
-What is the Hadoop shuffle?
+###HW3.0.
+####What is a merge sort? Where is it used in Hadoop?
+Merge sort is to merge two sorted lists into one sorted list. 
+It's used in the shuffling stage of Hadoop where key-value pairs from different mappers are merged into one before hand over to the reducer
+
+####How is  a combiner function in the context of Hadoop? 
+Combiner is a local aggregation mechanism, where during each mapper process, aggregation is done to collapse key-value earlier and send intermediate results to the reducer.
+The operation that can combiner is applicable must be associative and communicative. 
+
+####Give an example where it can be used and justify why it should be used in the context of this problem.
+In word count for long articles. Combiner can be applied within each mapper when processing on a node. 
+In this way, the number of key-value pairs is dramatically reduced before they are sent to the reducer. Consequently the network communication is reduced as well.
+
+####What is the Hadoop shuffle?
+Shuffle happens after all mapper processes complete and before reducer starts, all key-value pairs are sorted by key, and the same key is guaranteed to be delivered to the same reducer.
+
+####What is the Apriori algorithm? Describe an example use in your domain of expertise. Define confidence and lift.
 
 
 HW3.1 Use Counters to do EDA (exploratory data analysis and to monitor progress)
 Counters are lightweight objects in Hadoop that allow you to keep track of system progress in both the map and reduce stages of processing. By default, Hadoop defines a number of standard counters in "groups"; these show up in the jobtracker webapp, giving you information such as "Map input records", "Map output records", etc. 
 
-Consumer Complaints  Dataset Details
-Location of file: https://www.dropbox.com/s/vbalm3yva2rr86m/Consumer_Complaints.csv?dl=0
+While processing information/data using MapReduce job, it is a challenge to monitor the progress of parallel threads running across nodes of distributed clusters. Moreover, it is also complicated to distinguish between the data that has been processed and the data which is yet to be processed. The MapReduce Framework offers a provision of user-defined Counters, which can be effectively utilized to monitor the progress of data across nodes of distributed clusters.
 
-The consumer complaints dataset has been used as a sample to demonstrate Hadoop Counters. The dataset consists of diverse consumer complaints, which have been reported across the United States regarding various types of loans. The dataset consists of records of the form:
+Use the Consumer Complaints  Dataset provide here to complete this question:
+
+     https://www.dropbox.com/s/vbalm3yva2rr86m/Consumer_Complaints.csv?dl=0
+
+The consumer complaints dataset consists of diverse consumer complaints, which have been reported across the United States regarding various types of loans. The dataset consists of records of the form:
 
 Complaint ID,Product,Sub-product,Issue,Sub-issue,State,ZIP code,Submitted via,Date received,Date sent to company,Company,Company response,Timely response?,Consumer disputed?
 
@@ -36,27 +49,27 @@ Complaint ID,Product,Sub-product,Issue,Sub-issue,State,ZIP code,Submitted via,Da
 
 User-defined Counters
 
-While processing information/data using MapReduce job, it is a challenge to monitor the progress of parallel threads running across nodes of distributed clusters. Moreover, it is also complicated to distinguish between the data that has been processed and the data which is yet to be processed. The MapReduce Framework offers a provision of user-defined Counters, which can be effectively utilized to monitor the progress of data across nodes of distributed clusters.
-
 Now, let’s use Hadoop Counters to identify the number of complaints pertaining to debt collection, mortgage and other categories (all other categories get lumped into this one) in the consumer complaints dataset. Basically produce the distribution of the Product column in this dataset using counters (limited to 3 counters here).
 
-Hadoop offers Job Tracker, an UI tool to determine the status and statistics of all jobs. Using the job tracker UI, developers can view the Counters that have been created. Screen shot your  job tracker UI as it run and include it here. Make sure that your user defined counters are visible. 
+Hadoop offers Job Tracker, an UI tool to determine the status and statistics of all jobs. Using the job tracker UI, developers can view the Counters that have been created. Screenshot your  job tracker UI as your job completes and include it here. Make sure that your user defined counters are visible. 
 
 
 HW 3.2 Analyze the performance of your Mappers, Combiners and Reducers using Counters
 
-Input file with one record (the next line only): 
+For this brief study the Input file will be one record (the next line only): 
 foo foo quux labs foo bar quux
 
 
-Perform a word count analysis of this single record dataset using a Mapper and Reducer based WordCount (i.e., no combiners used anywhere) using user defined Counters to count up how many time the mapper and reducer are called. What is the value of your user defined Mapper Counter, and Reducer Counter after completing your word count job. The answer  should be 1 and 4 respectively. Please explain.
+Perform a word count analysis of this single record dataset using a Mapper and Reducer based WordCount (i.e., no combiners are used here) using user defined Counters to count up how many time the mapper and reducer are called. What is the value of your user defined Mapper Counter, and Reducer Counter after completing this word count job. The answer  should be 1 and 4 respectively. Please explain.
 
 Please use mulitple mappers and reducers for these jobs (at least 2 mappers and 2 reducers).
 Perform a word count analysis of the Issue column of the Consumer Complaints  Dataset using a Mapper and Reducer based WordCount (i.e., no combiners used anywhere)  using user defined Counters to count up how many time the mapper and reducer are called. What is the value of your user defined Mapper Counter, and Reducer Counter after completing your word count job. 
 
 Perform a word count analysis of the Issue column of the Consumer Complaints  Dataset using a Mapper, Reducer, and standalone combiner (i.e., not an in-memory combiner) based WordCount using user defined Counters to count up how many time the mapper, combiner, reducer are called. What is the value of your user defined Mapper Counter, and Reducer Counter after completing your word count job. 
-What are the top 50 most frequent terms in your word count analysis? Present the top 50 terms and their frequency and their relative frequency. Present the top 50 terms and their frequency and their relative frequency. If there are ties please sort the tokens in alphanumeric/string order. Present bottom 10 tokens (least frequent items). 
+Using a single reducer: What are the top 50 most frequent terms in your word count analysis? Present the top 50 terms and their frequency and their relative frequency. Present the top 50 terms and their frequency and their relative frequency. If there are ties please sort the tokens in alphanumeric/string order. Present bottom 10 tokens (least frequent items). 
 
+3.2.1 OPTIONAL 
+Using 2 reducers: What are the top 50 most frequent terms in your word count analysis? Present the top 50 terms and their frequency and their relative frequency. Present the top 50 terms and their frequency and their relative frequency. If there are ties please sort the tokens in alphanumeric/string order. Present bottom 10 tokens (least frequent items). 
 
 
 HW3.3. Shopping Cart Analysis
@@ -66,9 +79,9 @@ one of the examples of cross-selling that are frequently used by online retailer
 One simple method to give product recommendations is to recommend products that are frequently
 browsed together by the customers.
 
-For this homework use the online browsing behavior dataset at: 
+For this homework use the online browsing behavior dataset located at: 
 
-https://www.dropbox.com/s/zlfyiwa70poqg74/ProductPurchaseData.txt?dl=0
+       https://www.dropbox.com/s/zlfyiwa70poqg74/ProductPurchaseData.txt?dl=0
 
 Each line in this dataset represents a browsing session of a customer. 
 On each line, each string of 8 characters represents the id of an item browsed during that session. 
@@ -83,9 +96,13 @@ ELE17451 SNA69641 FRO86643 FRO78087 SNA11465 GRO39357 ELE28573 ELE11375 DAI54444
 
 
 Do some exploratory data analysis of this dataset. 
-Report your findings such as number of unique products; largest basket; report the top 50 most frequently purchased items,  their frequency,  and their relative frequency (break ties by sorting the products alphabetical order) etc. using Hadoop Map-Reduce. 
 
 How many unique items are available from this supplier?
+
+Using a single reducer: Report your findings such as number of unique products; largest basket; report the top 50 most frequently purchased items,  their frequency,  and their relative frequency (break ties by sorting the products alphabetical order) etc. using Hadoop Map-Reduce. 
+
+3.3.1 OPTIONAL 
+Using 2 reducers:  Report your findings such as number of unique products; largest basket; report the top 50 most frequently purchased items,  their frequency,  and their relative frequency (break ties by sorting the products alphabetical order) etc. using Hadoop Map-Reduce. 
 
 
 HW3.4. (Computationally prohibitive but then again Hadoop can handle this) Pairs
@@ -94,29 +111,69 @@ Suppose we want to recommend new products to the customer based on the products 
 have already browsed on the online website. Write a map-reduce program 
 to find products which are frequently browsed together. Fix the support count (cooccurence count) to s = 100 
 (i.e. product pairs need to occur together at least 100 times to be considered frequent) 
-and find pairs of items (sometimes referred to itemsets of size 2 in association rule mining).
+and find pairs of items (sometimes referred to itemsets of size 2 in association rule mining) that have a support count of 100 or more.
 
-List the top 50 product pairs with corresponding support count (aka frequency), and relative frequency or support (number of records whey they coccur, the number of records whey they coccur/the number of baskets in the dataset)  in decreasing order of support  for frequent (100>count) itemsets of size 2. 
-
-Please output records of the form for the top 50 pairs (itemsets of size 2): 
-
-item1, item2, support count, support
+List the top 50 product pairs with corresponding support count (aka frequency), and relative frequency or support (number of records where they coccur, the number of records where they coccur/the number of baskets in the dataset)  in decreasing order of support  for frequent (100>count) itemsets of size 2. 
 
 Use the Pairs pattern (lecture 3)  to  extract these frequent itemsets of size 2. Free free to use combiners if they bring value. Instrument your code with counters for count the number of times your mapper, combiner and reducers are called.  
+
+Please output records of the following form for the top 50 pairs (itemsets of size 2): 
+
+      item1, item2, support count, support
+
 
 
 Fix the ordering of the pairs lexicographically (left to right), 
 and break ties in support (between pairs, if any exist) 
 by taking the first ones in lexicographically increasing order. 
 
+Report  the compute time for the Pairs job. Describe the computational setup used (E.g., single computer; dual core; linux, number of mappers, number of reducers)
+Instrument your mapper, combiner, and reducer to count how many times each is called using Counters and report these counts.
+
 HW3.5: Stripes
+Repeat 3.4 using the stripes design pattern for finding cooccuring pairs.
 
-Pairs versus stripes: Use Map, reduce, counters
+Report  the compute times for stripes job versus the Pairs job. Describe the computational setup used (E.g., single computer; dual core; linux, number of mappers, number of reducers)
+
+Instrument your mapper, combiner, and reducer to count how many times each is called using Counters and report these counts. Discuss the differences in these counts between the Pairs and Stripes jobs
 
 
-OPTIONAL
 
-HW3.3. Shopping Cart Analysis
+
+OPTIONAL: all HW below this are optional 
+
+NOTE:   -- as of 1/28/2016 the instructions needs to be completed (Talk to Jimi)
+
+
+
+== Preliminary information ===
+
+Much of this homework will focus on the Apriori algorithm for frequent itemset mining.
+Please acquaint yourself with the background information (below)
+before approaching this week's coding assignments and relevant questions.
+
+=== Apriori background information ===
+
+Some background material for the  Apriori algorithm is located at:
+
+ - Slides in Live Session #3
+ - https://en.wikipedia.org/wiki/Apriori_algorithm
+ - https://www.dropbox.com/s/k2zm4otych279z2/Apriori-good-slides.pdf?dl=0
+ - http://snap.stanford.edu/class/cs246-2014/slides/02-assocrules.pdf
+
+Association Rules are frequently used for Market Basket Analysis (MBA) by retailers to
+understand the purchase behavior of their customers. This information can be then used for
+many different purposes such as cross-selling and up-selling of products, sales promotions,
+loyalty programs, store design, discount plans and many others.
+Evaluation of item sets: Once you have found the frequent itemsets of a dataset, you need
+to choose a subset of them as your recommendations. Commonly used metrics for measuring
+significance and interest for selecting rules for recommendations are: confidence; lift; and conviction.
+
+HW3.6
+What is the Apriori algorithm? Describe an example use in your domain of expertise. Define confidence and lift.
+
+
+HW3.7. Shopping Cart Analysis
 Product Recommendations: The action or practice of selling additional products or services 
 to existing customers is called cross-selling. Giving product recommendation is 
 one of the examples of cross-selling that are frequently used by online retailers. 
@@ -133,35 +190,8 @@ A rule is of the form:
 
 (item1) ⇒ item2.
 
-
-
-== Preliminary information ===
-
-Much of this homework will focus on the Apriori algorithm for frequent itemset mining.
-Please acquaint yourself with the background information (below)
-before approaching this week's coding assignments and relevant questions.
-
-=== Apriori background information ===
-
-Some background material for the  Apriori algorithm is located at:
-
- - https://en.wikipedia.org/wiki/Apriori_algorithm
- - https://www.dropbox.com/s/k2zm4otych279z2/Apriori-good-slides.pdf?dl=0
- - http://snap.stanford.edu/class/cs246-2014/slides/02-assocrules.pdf
-
-Association Rules are frequently used for Market Basket Analysis (MBA) by retailers to
-understand the purchase behavior of their customers. This information can be then used for
-many different purposes such as cross-selling and up-selling of products, sales promotions,
-loyalty programs, store design, discount plans and many others.
-Evaluation of item sets: Once you have found the frequent itemsets of a dataset, you need
-to choose a subset of them as your recommendations. Commonly used metrics for measuring
-significance and interest for selecting rules for recommendations are: confidence; lift; and conviction.
-
-HW3XXXXX
-What is the Apriori algorithm? Describe an example use in your domain of expertise. Define confidence and lift.
-
-
-HW3.3
+ 
+HW3.8
 
 Benchmark your results using the pyFIM implementation of the Apriori algorithm
 (Apriori - Association Rule Induction / Frequent Item Set Mining implemented by Christian Borgelt). 
@@ -173,7 +203,7 @@ Comment on the results from both implementations (your Hadoop MapReduce of aprio
 in terms of results and execution times.
 
 
-HW3.4 (Conceptual Exercise)
+HW3.8 (Conceptual Exercise)
 
 Suppose that you wished to perform the Apriori algorithm once again,
 though this time now with the goal of listing the top 5 rules with corresponding confidence scores 
