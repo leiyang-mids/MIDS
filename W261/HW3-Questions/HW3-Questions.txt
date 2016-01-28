@@ -94,6 +94,8 @@ ELE17451 GRO73461 DAI22896 SNA99873 FRO86643
 ELE17451 ELE37798 FRO86643 GRO56989 ELE23393 SNA11465 
 ELE17451 SNA69641 FRO86643 FRO78087 SNA11465 GRO39357 ELE28573 ELE11375 DAI54444 
 
+get pair line:
+pair=[[a[i],a[j]] for i in range(n) for j in range(i+1,n)]
 
 Do some exploratory data analysis of this dataset. 
 
