@@ -1,3 +1,11 @@
+link:
+https://docs.google.com/forms/d/1ZOr9RnIe_A06AcZDB6K1mJN4vrLeSmS2PD6Xm3eOiis/viewform
+pdf:
+https://github.com/leiyang-mids/MIDS/blob/master/W261/HW3-Questions/MIDS-W261-2016-HWK-Week03-Yang-Kennedy-Krishnaswami.pdf
+ipynb:
+http://nbviewer.jupyter.org/urls/github.com/leiyang-mids/MIDS/blob/master/W261/HW3-Questions/MIDS-W261-2016-HWK-Week03-Yang.ipynb
+http://nbviewer.jupyter.org/urls/dl.dropbox.com/s/l0r0xva1lnjwe06/MrjobTest.ipynb
+
 =====DATSCIW261 ASSIGNMENT #3=====
 
 MIDS UC Berkeley, Machine Learning at Scale
