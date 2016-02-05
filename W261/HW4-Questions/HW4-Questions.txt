@@ -1,24 +1,32 @@
 =====DATSCIW261 ASSIGNMENT #4=====
-
-V1.Final 9/22/2015
-
 MIDS UC Berkeley, Machine Learning at Scale
 DATSCIW261 ASSIGNMENT #4
+Version 2016-01-27 (FINAL)
+
+SPECIAL INSTURCTIONS
+ HW3 is a group exercise. Your team assignments for completing HW3 (and future homeworks) are located at:
+
+https://docs.google.com/spreadsheets/d/1ncFQl5Tovn-16slD8mYjP_nzMTPSfiGeLLzW8v_sMjg/edit?usp=sharing
+
+See column Team assignment for Homeworks in tab "Teams for HW Assignments"
+
+Note: please submit one homework submission per group.
 
 ---------------
-=== INSTRUCTIONS for SUBMISSIONS ===
+
 Please follow the instructions for submissions carefully.
-Note that all referenced files lile in the enclosing directory.
+Note that all referenced files life in the enclosing directory.
 
 === Week 4 ASSIGNMENTS ===
 
 HW 4.0.
 What is MrJob? How is it different to Hadoop MapReduce?
-What are the mapper_final(), combiner_final(), reducer_final() methods? When are they called?
+What are the mappint_init, mapper_final(), combiner_final(), reducer_final() methods? When are they called?
 
 mapper_final(): When Hadoop Streaming stops sending data to the map task, mrjob calls mapper_final(). That function emits the local aggregation result for this task, which is a much smaller set of output lines than the mapper would have output.
 combiner_final(): when Hadoop Streaming stops sending data to the combine task
 reducer_final(): when Hadoop Streaming stops sending data to the reduce task
+
 
 HW 4.1
 What is serialization in the context of MrJob or Hadoop?
@@ -49,9 +57,9 @@ V,1002,1,C, 10001
 
 Write the python code to accomplish this.
 
-HW 4.3: Find the 5 most frequently visited pages using mrjob from the output of 4.2 (i.e., transfromed log file).
+HW 4.3: Find the 5 most frequently visited pages using MrJob from the output of 4.2 (i.e., transfromed log file).
 
-HW 4.4: Find the most frequent visitor of each page using mrjob and the output of 4.2  (i.e., transfromed log file). In this output please include the webpage URL, webpageID and Visitor ID.
+HW 4.4: Find the most frequent visitor of each page using MrJob and the output of 4.2  (i.e., transfromed log file). In this output please include the webpage URL, webpageID and Visitor ID.
 
 HW 4.5 Here you will use a different dataset consisting of word-frequency distributions
 for 1,000 Twitter users. These Twitter users use language in very different ways,
@@ -90,7 +98,7 @@ USERID = unique user identifier
 CODE = 0/1/2/3 class code
 TOTAL = sum of the word counts
 
-Using this data, you will implement a 1000-dimensional K-means algorithm on the users
+Using this data, you will implement a 1000-dimensional K-means algorithm in MrJob on the users
 by their 1000-dimensional word stripes/vectors using several
 centroid initializations and values of K.
 
@@ -115,6 +123,18 @@ Note that you do not have to compute the aggregated distribution or the
 class-aggregated distributions, which are rows in the auxiliary file:
 
 topUsers_Apr-Jul_2014_1000-words_summaries.txt
+
+
+HW4.6  (OPTIONAL) Scaleable K-MEANS++
+
+Read the following paper entitled "Scaleable K-MEANS++" located at:
+
+http://theory.stanford.edu/~sergei/papers/vldb12-kmpar.pdf
+
+In MrJob, implement K-MEANS|| and compare with a random initializtion for the dataset above.
+Report on the number passes over the training data, and time required to run all  clustering algorithms.
+
+
 
 =====================
 END OF HOMEWORK
