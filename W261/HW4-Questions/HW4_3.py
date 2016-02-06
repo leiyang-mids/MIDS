@@ -32,8 +32,8 @@ class FreqVisitPage(MRJob):
         }
         combined_jobconf = orig_jobconf
         combined_jobconf.update(custom_jobconf)
-        return [MRStep(mapper=self.mapper_count, 
-                       reducer=self.reducer_count)
+        # TODO: doesn work on hadoop with jobconf set, need to check
+        return [MRStep(mapper=self.mapper_count, reducer=self.reducer_count)
                 ,MRStep(reducer=self.reducer_sort) #, jobconf=combined_jobconf)
                ]
     
