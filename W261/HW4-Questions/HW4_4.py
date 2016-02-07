@@ -39,14 +39,15 @@ class FreqVisitor(MRJob):
             
     # 3. mapper for sorting: partition by page id, secondary sorting/ranking by count
     def rank_mapper(self, key, count):   
-        #v, pID, c, cID, url = key.strip().split('_')
+        v, pID, c, cID, url = key.strip().split('_')
         #yield (pID, count, cID, url), None
-        
-        yield key, count
+        yield ('V_%s' %pID, count), ('%s_%s' %(cID, url))
     
     # 4. reducer get max vistor of each page
     def rank_reducer(self, key, value):
-        yield key, sum(value)
+        # yield key, sum(value) # working line
+        
+        yield key
            
     
     # 0. MapReduce steps
@@ -58,7 +59,7 @@ class FreqVisitor(MRJob):
         
         rank_jobconf = {
             'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
-            'mapreduce.partition.keycomparator.options': '-k1,1 -k2,2nr',
+            'mapreduce.partition.keycomparator.options': '-k1,1r -k2,2nr',
             'mapreduce.job.maps': '2',
             'mapreduce.job.reduces': '1',
             'stream.num.map.output.key.fields': '3',
