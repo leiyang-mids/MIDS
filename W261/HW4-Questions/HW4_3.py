@@ -31,7 +31,7 @@ class FreqVisitPage(MRJob):
             'mapreduce.job.reduces': '1',
             'stream.num.map.output.key.fields': '2',
             'mapreduce.map.output.key.field.separator': ' ',
-            'stream.map.output.field.separator': ' '
+            'stream.map.output.field.separator': ' ',
         }
         
         count_jobconf = {

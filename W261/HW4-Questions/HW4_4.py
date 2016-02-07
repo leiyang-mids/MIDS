@@ -29,7 +29,7 @@ class FreqVisitor(MRJob):
             yield 'V_%s_C_%s' %(temp[1], self.visitorID), 1
      
     # 2. reducer to get count for each visitor on each page
-    def count_reducer(self, key, value):        
+    def count_reducer(self, key, value):     
         temp = key.strip().split('_')
         # save webpage url for the following visisting records
         if temp[2] == '*':
@@ -40,14 +40,14 @@ class FreqVisitor(MRJob):
     # 3. mapper for sorting: partition by page id, secondary sorting/ranking by count
     def rank_mapper(self, key, count):   
         v, pID, c, cID, url = key.strip().split('_')
-        #yield (pID, count, cID, url), None
-        yield ('V_%s' %pID, count), ('%s_%s' %(cID, url))
+        # dimension of key and value will differ
+        yield 'V_%s\t%s' %(pID, count), 'C_%s\t%s' %(cID, url)
     
     # 4. reducer get max vistor of each page
     def rank_reducer(self, key, value):
-        # yield key, sum(value) # working line
-        
-        yield key
+        # final result
+        for v in value:
+            print '%s\t%s' %(key, v)
            
     
     # 0. MapReduce steps
@@ -62,12 +62,13 @@ class FreqVisitor(MRJob):
             'mapreduce.partition.keycomparator.options': '-k1,1r -k2,2nr',
             'mapreduce.job.maps': '2',
             'mapreduce.job.reduces': '1',
-            'stream.num.map.output.key.fields': '3',
-            'mapreduce.map.output.key.field.separator': ' ',
+            'stream.num.map.output.key.fields': '2',
+            'mapreduce.map.output.key.field.separator': '\t',
             'stream.map.output.field.separator': ' ',            
         }
-        return [MRStep(mapper=self.convert_mapper, reducer=self.count_reducer, jobconf=count_jobconf),
-                MRStep(mapper=self.rank_mapper, reducer=self.rank_reducer, jobconf=rank_jobconf)]
+        return [MRStep(mapper=self.convert_mapper, reducer=self.count_reducer, jobconf=count_jobconf)
+                ,MRStep(mapper=self.rank_mapper, reducer=self.rank_reducer, jobconf=rank_jobconf)
+               ]
         
     
 if __name__ == '__main__':
