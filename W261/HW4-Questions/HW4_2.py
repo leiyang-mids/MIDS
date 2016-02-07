@@ -7,7 +7,7 @@ class ConvertLog(MRJob):
     # mapper
     def convert_mapper(self, _, line):        
         # time of mapper being called
-        self.increment_counter('HW4_2', 'mapper', 1)
+        self.increment_counter('HW4_2', 'lines', 1)
         # only emit lines start with C and V
         line = line.strip()
         if line[0] not in ['C', 'V']:

@@ -3,10 +3,12 @@ from mrjob.step import MRStep
  
 class FreqVisitor(MRJob):
     
-    # visitor ID and url
+    # member variables: visitor ID and url
     url = visitorID = None
-        
-    # mapper
+    current_page = None
+    current_max = 0
+    
+    # 1. mapper
     def convert_mapper(self, _, line):        
         # time of mapper being called
         self.increment_counter('HW4_2', 'lines', 1)
@@ -25,26 +27,47 @@ class FreqVisitor(MRJob):
         else:
             # emit V_pageID_C_visitorID as key, 1 as value
             yield 'V_%s_C_%s' %(temp[1], self.visitorID), 1
-            
-    
-    # reducer to get count for each visitor on each page
-    def count_reducer(self, key, value):
-        
+     
+    # 2. reducer to get count for each visitor on each page
+    def count_reducer(self, key, value):        
         temp = key.strip().split('_')
         # save webpage url for the following visisting records
         if temp[2] == '*':
             self.url = temp[3]
         else:
             yield key+'_'+self.url, sum(value)
+            
+    # 3. mapper for sorting: partition by page id, secondary sorting/ranking by count
+    def rank_mapper(self, key, count):   
+        #v, pID, c, cID, url = key.strip().split('_')
+        #yield (pID, count, cID, url), None
         
-    # MapReduce steps
+        yield key, count
+    
+    # 4. reducer get max vistor of each page
+    def rank_reducer(self, key, value):
+        yield key, sum(value)
+           
+    
+    # 0. MapReduce steps
     def steps(self):
-        custom_jobconf = {  #key value pairs                        
+        count_jobconf = {  #key value pairs                        
             'mapreduce.job.maps': '1',
-            'mapreduce.job.reduces': '1'            
+            'mapreduce.job.reduces': '1', # must only use 1 reducer to have the proper order
         }
-        return [MRStep(mapper=self.convert_mapper, reducer=self.count_reducer, jobconf=custom_jobconf)]
-
+        
+        rank_jobconf = {
+            'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
+            'mapreduce.partition.keycomparator.options': '-k1,1 -k2,2nr',
+            'mapreduce.job.maps': '2',
+            'mapreduce.job.reduces': '1',
+            'stream.num.map.output.key.fields': '3',
+            'mapreduce.map.output.key.field.separator': ' ',
+            'stream.map.output.field.separator': ' ',            
+        }
+        return [MRStep(mapper=self.convert_mapper, reducer=self.count_reducer, jobconf=count_jobconf),
+                MRStep(mapper=self.rank_mapper, reducer=self.rank_reducer, jobconf=rank_jobconf)]
+        
     
 if __name__ == '__main__':
     FreqVisitor.run()
