@@ -1,13 +1,14 @@
 from numpy import argmin, array, random
 from mrjob.job import MRJob
-from mrjob.step import MRJobStep
+from mrjob.step import MRStep
 from itertools import chain
+import subprocess
 
-#Calculate find the nearest centroid for data point
+#Calculate find the nearest centroid for data point 
 def MinDist(datapoint, centroid_points):
     datapoint = array(datapoint)
     centroid_points = array(centroid_points)
-    diff = datapoint - centroid_points
+    diff = datapoint - centroid_points     
     diffsq = diff*diff
     # Get the nearest centroid for each instance
     minidx = argmin(list(diffsq.sum(axis = 1)))
@@ -27,16 +28,18 @@ def stop_criterion(centroid_points_old, centroid_points_new,T):
 
 class MRKmeans(MRJob):
     centroid_points=[]
-    k=3
+    k=3    
+            
     def steps(self):
         return [
-            MRJobStep(mapper_init = self.mapper_init, mapper=self.mapper,combiner = self.combiner,reducer=self.reducer)
+            MRStep(mapper_init = self.mapper_init, mapper=self.mapper,combiner = self.combiner,reducer=self.reducer)
                ]
     #load centroids info from file
-    def mapper_init(self):
-        self.centroid_points = [map(float,s.split('\n')[0].split(',')) for s in open("Centroids.txt").readlines()]
-        open('Centroids.txt', 'w').close()
-    #load data and output the nearest centroid index and data point
+    def mapper_init(self):   
+        cat = subprocess.Popen(["cat", "Centroids.txt"], stdout=subprocess.PIPE)        
+        self.centroid_points = [map(float, s.strip().split(',')) for s in cat.stdout]
+
+    #load data and output the nearest centroid index and data point 
     def mapper(self, _, line):
         D = (map(float,line.split(',')))
         yield int(MinDist(D,self.centroid_points)), (D[0],D[1],1)
@@ -49,9 +52,9 @@ class MRKmeans(MRJob):
             sumy = sumy + y
         yield idx,(sumx,sumy,num)
     #Aggregate sum for each cluster and then calculate the new centroids
-    def reducer(self, idx, inputdata):
+    def reducer(self, idx, inputdata): 
         centroids = []
-        num = [0]*self.k
+        num = [0]*self.k 
         for i in range(self.k):
             centroids.append([0,0])
         for x, y, n in inputdata:
@@ -60,9 +63,8 @@ class MRKmeans(MRJob):
             centroids[idx][1] = centroids[idx][1] + y
         centroids[idx][0] = centroids[idx][0]/num[idx]
         centroids[idx][1] = centroids[idx][1]/num[idx]
-        with open('Centroids.txt', 'a') as f:
-            f.writelines(str(centroids[idx][0]) + ',' + str(centroids[idx][1]) + '\n')
+        
         yield idx,(centroids[idx][0],centroids[idx][1])
-
+      
 if __name__ == '__main__':
     MRKmeans.run()
