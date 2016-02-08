@@ -30,7 +30,7 @@ def stop_criterion(centroid_points_old, centroid_points_new,T):
 class MRKmeans(MRJob):
     centroid_points=[]
     # TODO: figure out why set from mapper_init doesn't preserve value
-    k, n = 4, 1000
+    k, n = 2, 1000
 
     def steps(self):
         return [
