@@ -19,19 +19,14 @@ Note that all referenced files life in the enclosing directory.
 
 === Week 4 ASSIGNMENTS ===
 
-HW 4.0.
-What is MrJob? How is it different to Hadoop MapReduce?
-What are the mappint_init, mapper_final(), combiner_final(), reducer_final() methods? When are they called?
-
-mapper_final(): When Hadoop Streaming stops sending data to the map task, mrjob calls mapper_final(). That function emits the local aggregation result for this task, which is a much smaller set of output lines than the mapper would have output.
-combiner_final(): when Hadoop Streaming stops sending data to the combine task
-reducer_final(): when Hadoop Streaming stops sending data to the reduce task
-
+HW 4.0. 
+What is MrJob? How is it different to Hadoop MapReduce? 
+What are the mapper_init, mapper_final(), combiner_final(), reducer_final() methods? When are they called?
 
 HW 4.1
-What is serialization in the context of MrJob or Hadoop?
-When it used in these frameworks?
-What is the default serialization mode for input and outputs for MrJob?
+What is serialization in the context of MrJob or Hadoop? 
+When it used in these frameworks? 
+What is the default serialization mode for input and outputs for MrJob? 
 
 HW 4.2: Recall the Microsoft logfiles data from the async lecture. The logfiles are described are located at:
 
@@ -61,7 +56,7 @@ HW 4.3: Find the 5 most frequently visited pages using MrJob from the output of 
 
 HW 4.4: Find the most frequent visitor of each page using MrJob and the output of 4.2  (i.e., transfromed log file). In this output please include the webpage URL, webpageID and Visitor ID.
 
-HW 4.5 Here you will use a different dataset consisting of word-frequency distributions
+HW 4.5 Here you will use a different dataset consisting of word-frequency distributions 
 for 1,000 Twitter users. These Twitter users use language in very different ways,
 and were classified by hand according to the criteria:
 
@@ -99,7 +94,7 @@ CODE = 0/1/2/3 class code
 TOTAL = sum of the word counts
 
 Using this data, you will implement a 1000-dimensional K-means algorithm in MrJob on the users
-by their 1000-dimensional word stripes/vectors using several
+by their 1000-dimensional word stripes/vectors using several 
 centroid initializations and values of K.
 
 Note that each "point" is a user as represented by 1000 words, and that
@@ -109,30 +104,119 @@ of discrete, random distributions. For each user you will have to normalize
 by its "TOTAL" column. Try several parameterizations and initializations:
 
 (A) K=4 uniform random centroid-distributions over the 1000 words
-(B) K=2 perturbation-centroids, randomly perturbed from the aggregated (user-wide) distribution
-(C) K=4 perturbation-centroids, randomly perturbed from the aggregated (user-wide) distribution
+(B) K=2 perturbation-centroids, randomly perturbed from the aggregated (user-wide) distribution 
+(C) K=4 perturbation-centroids, randomly perturbed from the aggregated (user-wide) distribution 
 (D) K=4 "trained" centroids, determined by the sums across the classes.
 
-and iterate until a threshold (try 0.001) is reached.
+For (A),  we select 4 users randomly from a uniform distribution [1,...,1,000]
+For (B), (C), and (D)  you will have to use data from the auxiliary file: 
+
+topUsers_Apr-Jul_2014_1000-words_summaries.txt
+
+This file contains 5 special word-frequency distributions:
+
+(1) The 1000-user-wide aggregate, which you will perturb for initializations
+in parts (B) and (C), and
+
+(2-5) The 4 class-level aggregates for each of the user-type classes (0/1/2/3)
+
+In part (D), just use the (row-normalized) class-level aggregates as 'trained'
+starting centroids (the training is already done for you!).
+
+In parts (B) and (C), you will have to perturb the 1000-user aggregate 
+(after initially normalizing by its sum, which is also provided).
+So if in (B) you want to create 2 perturbations of the aggregate, start
+with (1), normalize, and generate 1000 random numbers uniformly 
+from the unit interval (0,1) twice (for two centroids), using:
+
+from numpy import random
+numbers = random.sample(1000)
+
+Take these 1000 numbers and add them (component-wise) to the 1000-user aggregate,
+and then renormalize to obtain one of your aggregate-perturbed initial centroids.
+——
+For experiments A, B, C and D and iterate until a threshold (try 0.001) is reached.
 After convergence, print out a summary of the classes present in each cluster.
 In particular, report the composition as measured by the total
 portion of each class type (0-3) contained in each cluster,
 and discuss your findings and any differences in outcomes across parts A-D.
 
-Note that you do not have to compute the aggregated distribution or the
+Note that you do not have to compute the aggregated distribution or the 
 class-aggregated distributions, which are rows in the auxiliary file:
 
 topUsers_Apr-Jul_2014_1000-words_summaries.txt
 
 
-HW4.6  (OPTIONAL) Scaleable K-MEANS++
+HW4.6  (OPTIONAL) Scaleable K-MEANS++ 
+
+Over half a century old and showing no signs of aging,
+k-means remains one of the most popular data processing
+algorithms. As is well-known, a proper initialization
+of k-means is crucial for obtaining a good final solution.
+The recently proposed k-means++ initialization algorithm
+achieves this, obtaining an initial set of centers that is provably
+close to the optimum solution. A major downside of the
+k-means++ is its inherent sequential nature, which limits its
+applicability to massive data: one must make k passes over
+the data to find a good initial set of centers. The paper listed below 
+shows how to drastically reduce the number of passes needed
+to obtain, in parallel, a good initialization. This is unlike
+prevailing efforts on parallelizing k-means that have mostly
+focused on the post-initialization phases of k-means. The 
+proposed initialization algorithm k-means||
+obtains a nearly optimal solution after a logarithmic number
+of passes; the paper also shows that in practice a constant
+number of passes suffices. Experimental evaluation on realworld
+large-scale data demonstrates that k-means|| outperforms
+k-means++ in both sequential and parallel settings.
 
 Read the following paper entitled "Scaleable K-MEANS++" located at:
 
-http://theory.stanford.edu/~sergei/papers/vldb12-kmpar.pdf
+http://theory.stanford.edu/~sergei/papers/vldb12-kmpar.pdf 
 
-In MrJob, implement K-MEANS|| and compare with a random initializtion for the dataset above.
-Report on the number passes over the training data, and time required to run all  clustering algorithms.
+In MrJob, implement K-MEANS|| and compare with a random initializtion when used in 
+conjunction with the kmeans algorithm as an initialization step for the 2D  dataset 
+generated using code in the following notebook:
+
+https://www.dropbox.com/s/lbzwmyv0d8rocfq/MrJobKmeans.ipynb?dl=0
+
+Plot the initialation centroids and the centroid trajectory as the K-MEANS|| algorithms iterates. 
+Repeat this for a random initalization (i.e., pick a training vector at random for each inital centroid)
+of the kmeans algorithm. Comment on the trajectories of both algorithms.
+Report on the number passes over the training data, and time required to run both  clustering algorithms.
+Also report the rand index score for both algorithms and comment on your findings.
+
+
+4.6.1 Apply your implementation of K-MEANS|| to the dataset  in HW 4.5 and compare to the a 
+random initalization (i.e., pick a training vector at random for each inital centroid)of the kmeans algorithm.
+Report on the number passes over the training data, and time required to run all  clustering algorithms. 
+Also report the rand index score for both algorithms and comment on your findings.
+
+
+
+
+HW4.7   (OPTIONAL) Canopy Clustering
+
+An alternative way to intialize the k-means algorithm is the  canopy clustering. The canopy clustering 
+algorithm is an unsupervised pre-clustering algorithm introduced by Andrew McCallum, Kamal Nigam and 
+Lyle Ungar in 2000. It is often used as preprocessing step for the K-means algorithm or the 
+Hierarchical clustering algorithm. It is intended to speed up clustering operations on large data sets, 
+where using another algorithm directly may be impractical due to the size of the data set.
+
+For more details on the Canopy Clustering algorithm see:
+
+https://en.wikipedia.org/wiki/Canopy_clustering_algorithm
+
+Plot the initialation centroids and the centroid trajectory as the Canopy Clustering based K-MEANS algorithm iterates. 
+Repeat this for a random initalization (i.e., pick a training vector at random for each inital centroid)
+of the kmeans algorithm. Comment on the trajectories of both algorithms.
+Report on the number passes over the training data, and time required to run both  clustering algorithms.
+Also report the rand index score for both algorithms and comment on your findings.
+
+4.7.1 Apply your implementation Canopy Clustering based K-MEANS algorithm to the dataset  in HW 4.5 and compare to the a 
+random initalization (i.e., pick a training vector at random for each inital centroid)of the kmeans algorithm.
+Report on the number passes over the training data, and time required to run both  clustering algorithms. 
+Also report the rand index score for both algorithms and comment on your findings.
 
 
 

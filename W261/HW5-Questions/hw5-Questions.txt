@@ -162,8 +162,6 @@ Hw 5.7 (optional)
 Once again, benchmark your top 10,000 associations (as in 5.5), this time for your
 results from 5.6. Has your detector improved?
 
-Hw 5.7 (optional)
-
 --
 
 =====================
