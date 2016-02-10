@@ -25,8 +25,8 @@ mrjob is an open-source Python 2.6+ [package](https://github.com/Yelp/mrjob), or
 that helps write and run (Hadoop Streaming)[http://hadoop.apache.org/docs/r2.7.2/hadoop-streaming/HadoopStreaming.html] jobs.
 mrjob fully supports Amazon's Elastic MapReduce (EMR)[https://aws.amazon.com/elasticmapreduce/] service, which allows buying time on a Hadoop cluster on an hourly basis. It also works with one's local Hadoop cluster.
 mrjob can also run directly via Python, for testing/debugging purpose.
-mrjob is a utility library that simplifies writing and running Hadoop Streaming jobs, developer doesn't need to handle lower level tasks in Hadoop Streaming such as MapReduce job chaining, 
-i/o management etc. User can instead focus on writing the analysis procedures for the data pipeline. In addition, mrjob provides granular control on job execution through various [step definition](https://pythonhosted.org/mrjob/job.html).
+mrjob is a utility library that simplifies writing and running Hadoop Streaming jobs, developer doesn't need to handle many lower level tasks in Hadoop Streaming such as MapReduce job chaining, 
+i/o management etc. User can instead focus on writing the analysis procedures for the data pipeline. In addition, mrjob provides granular control on job execution through various [step definitions](https://pythonhosted.org/mrjob/job.html).
 Hadoop MapReduce is the execution engine that mrjob sends the MapReduce job to, and receives results from.
 
 What are the mapper_init(), mapper_final(), combiner_final(), reducer_final() methods? When are they called?
@@ -35,7 +35,7 @@ mapper_init() lets the user define any action the job needs to execute *before* 
 HW 4.1
 What is serialization in the context of MrJob or Hadoop? When it used in these frameworks?
 Serialization is the process of converting input and output of tasks to raw bytes for Hadoop to distribute to the next task or to write as output.
-Serialization/deserialization is used for i/o management and data transfer, where job input/output with different format between mrjob and Hadoop are streaming through 
+Serialization/deserialization is used by i/o management and data transfer, where job input/output with different format between mrjob and Hadoop are streaming through 
 the data analysis pipeline during the job execution.
 
 
