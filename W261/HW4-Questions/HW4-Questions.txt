@@ -1,3 +1,12 @@
+link:
+https://docs.google.com/forms/d/1ZOr9RnIe_A06AcZDB6K1mJN4vrLeSmS2PD6Xm3eOiis/viewform
+pdf:
+https://github.com/leiyang-mids/MIDS/blob/master/W261/HW4-Questions/MIDS-W261-2016-HWK-Week04-Yang-Kennedy-Krishnaswami.pdf
+ipynb:
+https://nbviewer.jupyter.org/urls/github.com/leiyang-mids/MIDS/blob/master/W261/HW4-Questions/MIDS-W261-2016-HWK-Week04-Yang.ipynb
+
+
+
 =====DATSCIW261 ASSIGNMENT #4=====
 MIDS UC Berkeley, Machine Learning at Scale
 DATSCIW261 ASSIGNMENT #4
@@ -25,7 +34,7 @@ mrjob is an open-source Python 2.6+ [package](https://github.com/Yelp/mrjob), or
 that helps write and run (Hadoop Streaming)[http://hadoop.apache.org/docs/r2.7.2/hadoop-streaming/HadoopStreaming.html] jobs.
 mrjob fully supports Amazon's Elastic MapReduce (EMR)[https://aws.amazon.com/elasticmapreduce/] service, which allows buying time on a Hadoop cluster on an hourly basis. It also works with one's local Hadoop cluster.
 mrjob can also run directly via Python, for testing/debugging purpose.
-mrjob is a utility library that simplifies writing and running Hadoop Streaming jobs, developer doesn't need to handle many lower level tasks in Hadoop Streaming such as MapReduce job chaining, 
+mrjob is a utility library that simplifies writing and running Hadoop Streaming jobs, developer doesn't need to handle many lower level tasks in Hadoop Streaming such as MapReduce job chaining,
 i/o management etc. User can instead focus on writing the analysis procedures for the data pipeline. In addition, mrjob provides granular control on job execution through various [step definitions](https://pythonhosted.org/mrjob/job.html).
 Hadoop MapReduce is the execution engine that mrjob sends the MapReduce job to, and receives results from.
 
@@ -35,14 +44,14 @@ mapper_init() lets the user define any action the job needs to execute *before* 
 HW 4.1
 What is serialization in the context of MrJob or Hadoop? When it used in these frameworks?
 Serialization is the process of converting input and output of tasks to raw bytes for Hadoop to distribute to the next task or to write as output.
-Serialization/deserialization is used by i/o management and data transfer, where job input/output with different format between mrjob and Hadoop are streaming through 
+Serialization/deserialization is used by i/o management and data transfer, where job input/output with different format between mrjob and Hadoop are streaming through
 the data analysis pipeline during the job execution.
 
 
 What is the default serialization mode for input and outputs for MrJob?
 The default input protocol is RawValueProtocol, which reads and writes lines of raw text with no key. So by default, the first step in your job sees (None, <text of the line>) for each line of input.
 The default output and internal protocols are both JSONProtocol, which reads and writes JSON strings separated by a tab character.
-mrjob includes 4 [protocols](https://pythonhosted.org/mrjob/guides/writing-mrjobs.html#job-protocols); 
+mrjob includes 4 [protocols](https://pythonhosted.org/mrjob/guides/writing-mrjobs.html#job-protocols);
 in addition, user can define [custom protocols](https://pythonhosted.org/mrjob/guides/writing-mrjobs.html#writing-protocols).
 
 HW 4.2: Recall the Microsoft logfiles data from the async lecture. The logfiles are described are located at:
