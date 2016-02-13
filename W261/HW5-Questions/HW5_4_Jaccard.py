@@ -48,22 +48,39 @@ class Jaccard(MRJob):
         # get all postings from generator
         posts = [p for p in postings]
         size = len(posts)
-        # emit dummy for order inversion
+        # emit dummy for order inversion, for |A| and |B|
         for p in posts:
             yield ('*', p), 1
-        # emit pairs (here assuming job 1 partitioner did secondary sort)
+        # emit pairs (here assuming job 1 partitioner did secondary sort) for |A \cap B|
         for p1, p2 in [[posts[i], posts[j]] for i in range(size) for j in range(i+1, size)]:
             yield (p1, p2), 1
     
+    # job 2 combiner - local count aggregation
     def j2_combiner(self, pair, count):
-        yield pair, sum(count)
+        yield (pair), sum(count)
+        
+    # job 2 reducer_init - create helper data structures
+    def j2_reducer_init(self):
+        self.current_pair = None
+        self.current_count = 0
+        self.current_m = None
+        
+    # job 2 reducer - get pair similarity
+    def j2_reducer(self, pair, count):
+        p1, p2 = pair[0], pair[1]
+        # get marginal
+        #if p1 == '*':
+            
             
     # MapReduce steps
     def steps(self):
         # step configure for sorting
         return [MRStep(mapper=self.j1_mapper_test, reducer_init=self.j1_reducer_init,
                        reducer=self.j1_reducer, reducer_final=self.j1_reducer_final),
-                MRStep(mapper=self.j2_mapper, combiner=self.j2_combiner)
+                MRStep(mapper=self.j2_mapper, combiner=self.j2_combiner, 
+                       reducer_init=self.j2_reducer_init
+                       #, reducer=self.j2_reducer
+                      )
                ]
 
 if __name__ == '__main__':
