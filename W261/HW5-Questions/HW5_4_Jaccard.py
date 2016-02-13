@@ -63,13 +63,24 @@ class Jaccard(MRJob):
     def j2_reducer_init(self):
         self.current_pair = None
         self.current_count = 0
-        self.current_m = None
+        self.marginals = {}
+        self.current_marginal = None
         
     # job 2 reducer - get pair similarity
     def j2_reducer(self, pair, count):
         p1, p2 = pair[0], pair[1]
-        # get marginal
-        #if p1 == '*':
+        tot = sum(count)
+        # accumulate marginal and cache them
+        if p1 == '*':
+            if p2 not in self.marginals:
+                self.marginals[p2] = tot
+            else:
+                self.marginals[p2] += tot
+        else:
+            # calculate similarity
+            yield (p1,p2), 1.0*tot/(self.marginals[p1]+self.marginals[p2]-tot)           
+            
+            
             
             
     # MapReduce steps
@@ -79,7 +90,7 @@ class Jaccard(MRJob):
                        reducer=self.j1_reducer, reducer_final=self.j1_reducer_final),
                 MRStep(mapper=self.j2_mapper, combiner=self.j2_combiner, 
                        reducer_init=self.j2_reducer_init
-                       #, reducer=self.j2_reducer
+                       , reducer=self.j2_reducer
                       )
                ]
 
