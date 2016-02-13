@@ -2,12 +2,25 @@
 
 MIDS UC Berkeley, Machine Learning at Scale
 DATSCIW261 ASSIGNMENT #5
-
+Version 2016-02-12 (FINAL)
 ---------------
 === INSTRUCTIONS for SUBMISSIONS ===
+
+
+SPECIAL INSTURCTIONS
+ This weeks homework is a group exercise. Your team assignments for completing this HW are located at:
+
+https://docs.google.com/spreadsheets/d/1ncFQl5Tovn-16slD8mYjP_nzMTPSfiGeLLzW8v_sMjg/edit?usp=sharing
+
+See column Team assignment for Homeworks in tab "Teams for HW Assignments"
+
+Please submit your homeworks (one per team) going forward via this form (and not thru the ISVC):
+
+https://docs.google.com/forms/d/1ZOr9RnIe_A06AcZDB6K1mJN4vrLeSmS2PD6Xm3eOiis/viewform?usp=send_form
+
 Please follow the instructions for submissions carefully.
 
-=== Week 5 ASSIGNMENTS ===
+================= Week 5 ASSIGNMENTS ================
 
 HW 5.0
 What is a data warehouse? What is a Star schema? When is it used?
@@ -33,16 +46,32 @@ Please report the number of rows resulting from:
 (3) Inner joining Table Left with Table Right
 --
 
-HW 5.3 For the remainder of this assignment you will work with a large subset 
-of the Google n-grams dataset,
+HW 5.3 For the remainder of this assignment you will work with two datasets:
+
+### 1: unit/systems test data set: SYSTEMS TEST DATASET
+Three terms, A,B,C and their corresponding strip-docs of co-occurring terms
+
+DocA {X:20, Y:30, Z:5}
+DocB {X:100, Y:20}
+DocC {M:5, N:20, Z:5}
+
+
+### 2: A large subset of the Google n-grams dataset
 
 https://aws.amazon.com/datasets/google-books-ngrams/
 
-which we have placed in a bucket on s3:
+which we have placed in a bucket/folder on Dropbox on s3:
 
-s3://filtered-5grams/
+   https://www.dropbox.com/sh/tmqpc4o0xswhkvz/AACUifrl6wrMrlK6a3X3lZ9Ea?dl=0 
 
-In particular, this bucket contains (~200) files in the format:
+   s3://filtered-5grams/
+
+For each HW 5.3 -5.5 Please unit test and system test your code with with SYSTEMS TEST DATASET and show the results. 
+Please compute the expected answer by hand and show your hand calculations. Then show the results you get with you system.
+Final show your results on the Google n-grams dataset
+
+
+In particular, this bucket contains (~200) files (10Meg each) in the format:
 
 	(ngram) \t (count) \t (pages_count) \t (books_count)
 
@@ -95,12 +124,12 @@ For this task you will have to determine a method of comparison.
 Here are a few that you might consider:
 
 - Jaccard
+- Cosine similarity
 - Spearman correlation
 - Euclidean distance
 - Taxicab (Manhattan) distance
 - Shortest path graph distance (a graph, because our data is symmetric!)
 - Pearson correlation
-- Cosine similarity
 - Kendall correlation
 ...
 
@@ -108,7 +137,7 @@ However, be cautioned that some comparison methods are more difficult to
 parallelize than others, and do not perform more associations than is necessary, 
 since your choice of association will be symmetric.
 
-Please use the inverted index (discussed in live session #6) based pattern to compute the pairwise (term-by-term) similarity matrix. 
+Please use the inverted index (discussed in live session #5) based pattern to compute the pairwise (term-by-term) similarity matrix. 
 
 HW 5.5
 In this part of the assignment you will evaluate the success of you synonym detector.
