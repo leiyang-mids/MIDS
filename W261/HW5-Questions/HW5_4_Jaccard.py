@@ -60,7 +60,7 @@ class Jaccard(MRJob):
         posts = [p for p in postings]
         size = len(posts)
         # emit dummy for order inversion, for |A| and |B|
-        # count is 1 since Jaccard is binary and doesn't care number of occurrence
+        # emit 1 here since Jaccard is binary and doesn't care count
         for p in posts:
             yield ('*', p), 1
         # emit pairs (here assuming job 1 partitioner did secondary sort) for |A \cap B|
@@ -91,8 +91,21 @@ class Jaccard(MRJob):
         else:
             # calculate similarity
             yield (p1,p2), 1.0*tot/(self.marginals[p1]+self.marginals[p2]-tot)           
-            
-            
+                   
+    # job 3 mapper - for secondary sort
+    def j3_mapper(self, pair, sim):
+        yield pair, sim
+        
+    # job 3 reducer_init
+    def j3_reducer_init(self):
+        self.top = 100
+        self.n = 0
+    
+    # job 3 reducer - show top 100 pairs
+    def j3_reducer(self, pair, sim):
+        self.n += 1
+        if self.n <= self.top:
+            yield pair, sum(sim)
             
     # MapReduce steps
     def steps(self):
@@ -101,7 +114,8 @@ class Jaccard(MRJob):
                        , combiner=self.j1_combiner, reducer_init=self.j1_reducer_init,
                        reducer=self.j1_reducer, reducer_final=self.j1_reducer_final),
                 MRStep(mapper=self.j2_mapper, combiner=self.j2_combiner, 
-                       reducer_init=self.j2_reducer_init, reducer=self.j2_reducer)
+                       reducer_init=self.j2_reducer_init, reducer=self.j2_reducer),
+                MRStep(mapper=self.j3_mapper, reducer_init=self.j3_reducer_init, reducer=self.j3_reducer)
                ]
 
 if __name__ == '__main__':
