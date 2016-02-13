@@ -37,6 +37,7 @@ class Jaccard(MRJob):
                         
     # job 1 reducer
     def j1_reducer(self, key, count):
+        #yield key, sum(count)
         term, doc = key[0], key[1]           
         if self.current_term == term:
             # accumulate postings
@@ -48,7 +49,7 @@ class Jaccard(MRJob):
             # reset new term
             self.current_term = term
             self.current_strip = {doc:sum(count)}
-        
+                    
     # job 1 reducer final - emit last strip
     def j1_reducer_final(self):
         if self.current_term:
@@ -94,7 +95,7 @@ class Jaccard(MRJob):
                    
     # job 3 mapper - for secondary sort
     def j3_mapper(self, pair, sim):
-        yield pair, sim
+        yield (pair, sim), None
         
     # job 3 reducer_init
     def j3_reducer_init(self):
@@ -102,20 +103,57 @@ class Jaccard(MRJob):
         self.n = 0
     
     # job 3 reducer - show top 100 pairs
-    def j3_reducer(self, pair, sim):
+    def j3_reducer(self, result, _):
         self.n += 1
         if self.n <= self.top:
-            yield pair, sum(sim)
+            yield result
             
     # MapReduce steps
     def steps(self):
+        jobconf1 = {  #key value pairs            
+            'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
+            'mapreduce.partition.keycomparator.options': '-k1,1r -k2,2r', # no need to sort
+            #'mapred.text.key.partitioner.options' : '-k1,1 -k2,2r',
+            #'mapreduce.partition.keypartitioner.options': '-k1,2',
+            'mapreduce.job.maps': '4',
+            'mapreduce.job.reduces': '3',
+            'stream.num.map.output.key.fields': '2',
+            'mapreduce.map.output.key.field.separator': ',',
+            'stream.map.output.field.separator': ' ',
+        }
+        jobconf2 = {  #key value pairs            
+            'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
+            'mapreduce.partition.keycomparator.options': '-k1,1r -k2,2r', # -k2,2r',
+            #'mapred.text.key.partitioner.options' : '-k1,1 -k2,2r',
+            #'mapreduce.partition.keypartitioner.options': '-k1,2',
+            'mapreduce.job.maps': '3',
+            'mapreduce.job.reduces': '1',
+            'stream.num.map.output.key.fields': '2',
+            'mapreduce.map.output.key.field.separator': ' ',
+            'stream.map.output.field.separator': ' ',
+        }
+        jobconf3 = {  #key value pairs            
+            'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
+            'mapreduce.partition.keycomparator.options': '-k3,3nr',
+            'mapreduce.job.maps': '2',
+            'mapreduce.job.reduces': '1',
+            'stream.num.map.output.key.fields': '2',
+            'mapreduce.map.output.key.field.separator': ' ',
+            'stream.map.output.field.separator': ' ',
+        }
         # step configure for sorting
-        return [MRStep(mapper=self.j1_mapper_test
-                       , combiner=self.j1_combiner, reducer_init=self.j1_reducer_init,
-                       reducer=self.j1_reducer, reducer_final=self.j1_reducer_final),
-                MRStep(mapper=self.j2_mapper, combiner=self.j2_combiner, 
-                       reducer_init=self.j2_reducer_init, reducer=self.j2_reducer),
-                MRStep(mapper=self.j3_mapper, reducer_init=self.j3_reducer_init, reducer=self.j3_reducer)
+        # NOTE: DO NOT use jobconf when running with Python locally
+        return [MRStep(mapper=self.j1_mapper_5gram
+                       , combiner=self.j1_combiner, reducer_init=self.j1_reducer_init
+                 #      , reducer=self.j1_reducer, reducer_final=self.j1_reducer_final
+                       , jobconf=jobconf1
+                      )
+                #,MRStep(mapper=self.j2_mapper, combiner=self.j2_combiner, 
+                #       reducer_init=self.j2_reducer_init, reducer=self.j2_reducer
+                #       , jobconf=jobconf2
+                #       )
+                #,MRStep(mapper=self.j3_mapper, reducer_init=self.j3_reducer_init, 
+                #       reducer=self.j3_reducer, jobconf=jobconf3)
                ]
 
 if __name__ == '__main__':
