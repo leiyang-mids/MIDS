@@ -54,12 +54,16 @@ class Jaccard(MRJob):
         # emit pairs (here assuming job 1 partitioner did secondary sort)
         for p1, p2 in [[posts[i], posts[j]] for i in range(size) for j in range(i+1, size)]:
             yield (p1, p2), 1
+    
+    def j2_combiner(self, pair, count):
+        yield pair, sum(count)
             
     # MapReduce steps
     def steps(self):
+        # step configure for sorting
         return [MRStep(mapper=self.j1_mapper_test, reducer_init=self.j1_reducer_init,
                        reducer=self.j1_reducer, reducer_final=self.j1_reducer_final),
-                MRStep(mapper=self.j2_mapper)
+                MRStep(mapper=self.j2_mapper, combiner=self.j2_combiner)
                ]
 
 if __name__ == '__main__':
