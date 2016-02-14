@@ -139,7 +139,7 @@ class Jaccard(MRJob):
             #'mapreduce.partition.keycomparator.options': '-k1,1r -k2,2r', # no need to sort            
             'mapreduce.partition.keypartitioner.options': '-k1,1',            
             'mapreduce.job.maps': '5',
-            'mapreduce.job.reduces': '1', # on local cluster partitioner setting doesn't work 
+            'mapreduce.job.reduces': '3', # on local cluster partitioner setting doesn't work 
             'stream.num.map.output.key.fields': '2',
             'mapreduce.map.output.key.field.separator': ',',
             'stream.map.output.field.separator': '\t',
@@ -158,21 +158,13 @@ class Jaccard(MRJob):
             'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
             #'mapreduce.partition.keycomparator.options': '-k1,1r -k2,2r', # -k2,2r',
             'mapreduce.partition.keypartitioner.options': '-k1,2',
-            'mapreduce.job.maps': '4',
-            'mapreduce.job.reduces': '1', # because of order inversion, other possibility include customer partitioner
+            'mapreduce.job.maps': '10',
+            'mapreduce.job.reduces': '10',
             'stream.num.map.output.key.fields': '2',
             'mapreduce.map.output.key.field.separator': ',',
             'stream.map.output.field.separator': '\t',
         }
-        jobconf3 = {  #key value pairs            
-            #'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
-            #'mapreduce.partition.keycomparator.options': '-k2,2nr',
-            #'mapreduce.job.maps': '3',
-            #'mapreduce.job.reduces': '1',
-            #'stream.num.map.output.key.fields': '2',
-            #'mapreduce.map.output.key.field.separator': ' ',
-            #'stream.map.output.field.separator': '\t',
-            
+        jobconf3 = {  #key value pairs 
             'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
             'mapreduce.partition.keycomparator.options': '-k1,1nr',
             'mapreduce.job.maps': '3',
@@ -194,21 +186,21 @@ class Jaccard(MRJob):
                         , jobconf=jobconf0
                       )
                 ######## job 1: get inverted indexing ########
-                ,MRStep(mapper=self.j1_mapper_cosine                
-                        , reducer_init=self.j1_reducer_init
-                        , reducer=self.j1_reducer, reducer_final=self.j1_reducer_final
-                        , jobconf=jobconf1
-                      )
+                #,MRStep(mapper=self.j1_mapper_cosine                
+                #        , reducer_init=self.j1_reducer_init
+                #        , reducer=self.j1_reducer, reducer_final=self.j1_reducer_final
+                #        , jobconf=jobconf1
+                #      )
                 ######## job 2: calculate pair similarity between words ########
-                ,MRStep(mapper=self.j2_mapper, combiner=self.j2_reducer
-                        , reducer=self.j2_reducer
-                        , jobconf=jobconf2
-                      )
+                #,MRStep(mapper=self.j2_mapper, combiner=self.j2_reducer
+                #        , reducer=self.j2_reducer
+                #        , jobconf=jobconf2
+                #      )
                 ######## job 3: sort similarities ########
-                ,MRStep(mapper=self.j3_mapper, reducer_init=self.j3_reducer_init
-                        , reducer=self.j3_reducer
-                        , jobconf=jobconf3
-                       )
+                #,MRStep(mapper=self.j3_mapper, reducer_init=self.j3_reducer_init
+                #        , reducer=self.j3_reducer
+                #        , jobconf=jobconf3
+                #       )
                ]
 
 if __name__ == '__main__':
