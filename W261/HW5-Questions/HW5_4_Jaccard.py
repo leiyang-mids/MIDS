@@ -132,7 +132,7 @@ class Jaccard(MRJob):
                    
     # job 3 mapper - for secondary sort
     def j3_mapper(self, pair, sim):
-        yield (str(pair), sim), None
+        yield (sim, pair), None
         
     # job 3 reducer_init
     def j3_reducer_init(self):
@@ -187,14 +187,14 @@ class Jaccard(MRJob):
             #'stream.map.output.field.separator': '\t',
             
             'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
-            'mapreduce.partition.keycomparator.options': '-k2,2nr',
+            'mapreduce.partition.keycomparator.options': '-k1,1nr',
             'mapreduce.job.maps': '3',
             'mapreduce.job.reduces': '1',
-            'stream.num.map.output.key.fields': '2',
-            'mapreduce.map.output.key.field.separator': ' ',
-            'stream.map.output.field.separator': ' ',
+            #'stream.num.map.output.key.fields': '2',
+            #'mapreduce.map.output.key.field.separator': ' ',
+            #'stream.map.output.field.separator': ' ',
         }
-        # step configure for sorting
+        
         # NOTE: DO NOT use jobconf when running with Python locally
         return [
                 ######## job 0: get co-ocurrence matrix ########
