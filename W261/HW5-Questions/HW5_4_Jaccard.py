@@ -4,6 +4,8 @@ from math import sqrt
  
 class Jaccard(MRJob):
     
+    #################################  job 0 - create co-occurrence matrix ##############################
+    
     # job 0 mapper for SYSTEMS_TEST_DATASET
     def j0_mapper_read_test(self, _, line):        
         # time of mapper being called
@@ -25,7 +27,7 @@ class Jaccard(MRJob):
         for w1, w2 in [[grams[i], grams[j]] for i in range(n_gram) for j in range(n_gram)]:
             yield (w1, w2), int(cnt)
                         
-    # job 0 combiner - local aggregation
+    # job 0 combiner - local aggregation of co-occurrence
     def j0_combiner(self, pair, count):
         yield (pair), sum(count)
     
@@ -55,80 +57,63 @@ class Jaccard(MRJob):
         if self.current_term:
             yield self.current_term, self.current_strip
     
-    #################################        
+    #################################  job 1 - create inverted indexing ##############################
+    
     # job 1 mapper - build inverted index
-    def j1_mapper(self, word, stripe):
-        # here stripe is a dictionary
-        for w in stripe:
-            yield (w, word), stripe[w]
+    def j1_mapper_jaccard(self, w1, stripe):
+        # here stripe is a dictionary 
+        norm = sqrt(len(stripe))
+        for w2 in stripe:                        
+            yield (w2, w1), 1/norm
             
-    # job 1 combiner - local aggregation
-    def j1_combiner(self, pair, count):
-        yield (pair), sum(count)
+    def j1_mapper_cosine(self, w1, stripe):
+        # here stripe is a dictionary    
+        norm = sqrt(sum(pow(x,2) for x in stripe.values()))
+        for w2 in stripe:            
+            yield (w2, w1), stripe[w2]/norm
     
     # job 1 reducer_init()
     def j1_reducer_init(self):
         self.current_term = None
         self.current_strip = {}
-                        
+                                
     # job 1 reducer
-    def j1_reducer(self, key, count):        
-        term, doc = key[0], key[1]                   
-        #term,doc = key.split('\t')
-        if self.current_term == term:
+    def j1_reducer(self, pair, count):        
+        w2, w1 = pair[0], pair[1]
+        if self.current_term == w2:
             # accumulate postings
-            self.current_strip[doc] = sum(count)
+            self.current_strip[w1] = sum(count)
         else:
             # yield previous term and stripe
             if self.current_term:
                 yield self.current_term, self.current_strip
             # reset new term
-            self.current_term = term
-            self.current_strip = {doc:sum(count)}
+            self.current_term = w2
+            self.current_strip = {w1:sum(count)}
                     
     # job 1 reducer final - emit last index strip
     def j1_reducer_final(self):
         if self.current_term:
             yield self.current_term, self.current_strip
             
+    #################################  job 2 - evaluate similarity between words ##############################
+            
     # job 2 mapper - emit pair-wise similarity from strips
     def j2_mapper(self, term, postings):
         # get all postings from generator
-        posts = [p for p in postings]
+        posts = postings.keys() # [p for p in postings]
         posts.sort()
-        size = len(posts)
-        # emit dummy for order inversion, for |A| and |B|
-        # emit 1 here since Jaccard is binary and doesn't care count
-        for p in posts:
-            yield ('*', p), 1
+        size = len(posts)        
         # emit pairs on sorted stripe, so we only evaluate half of the symmetric relation
-        for p1, p2 in [[posts[i], posts[j]] for i in range(size) for j in range(i+1, size)]:
-            yield (p1, p2), 1
-    
-    # job 2 combiner - local count aggregation
-    def j2_combiner(self, pair, count):
-        yield (pair), sum(count)
-        
-    # job 2 reducer_init - create helper data structures
-    def j2_reducer_init(self):
-        #self.current_pair = None
-        #self.current_count = 0
-        self.marginals = {}
-        #self.current_marginal = None
-        
+        for w1, w2 in [[posts[i], posts[j]] for i in range(size) for j in range(i+1, size)]:
+            yield (w1, w2), postings[w1]*postings[w2]
+            
     # job 2 reducer - get pair similarity
-    def j2_reducer(self, pair, count):
-        p1, p2 = pair[0], pair[1]
-        tot = sum(count)
-        # accumulate marginal and cache them
-        if p1 == '*':
-            if p2 not in self.marginals:
-                self.marginals[p2] = tot
-            else:
-                self.marginals[p2] += tot
-        else:
-            # calculate similarity
-            yield (p1,p2), 1.0*tot/(self.marginals[p1]+self.marginals[p2]-tot)           
+    def j2_reducer(self, pair, prod):
+        # calculate similarity
+        yield (pair), sum(prod)
+            
+    #################################  job 3 - rank pairwise similarities ##############################
                    
     # job 3 mapper - for secondary sort
     def j3_mapper(self, pair, sim):
@@ -136,7 +121,7 @@ class Jaccard(MRJob):
         
     # job 3 reducer_init
     def j3_reducer_init(self):
-        self.top = 200
+        self.top = 300
         self.n = 0
     
     # job 3 reducer - show top 100 pairs
@@ -144,6 +129,8 @@ class Jaccard(MRJob):
         self.n += 1
         if self.n <= self.top:
             yield result
+            
+    #################################  mrjob definition ##############################
             
     # MapReduce steps
     def steps(self):
@@ -190,9 +177,9 @@ class Jaccard(MRJob):
             'mapreduce.partition.keycomparator.options': '-k1,1nr',
             'mapreduce.job.maps': '3',
             'mapreduce.job.reduces': '1',
-            #'stream.num.map.output.key.fields': '2',
-            #'mapreduce.map.output.key.field.separator': ' ',
-            #'stream.map.output.field.separator': ' ',
+            'stream.num.map.output.key.fields': '2',
+            'mapreduce.map.output.key.field.separator': ',',
+            'stream.map.output.field.separator': '\t',
         }
         
         # NOTE: DO NOT use jobconf when running with Python locally
@@ -202,21 +189,21 @@ class Jaccard(MRJob):
                 #MRStep(mapper=self.j0_mapper_read_test)
                 ### for n-gram file ###
                 MRStep(mapper=self.j0_mapper_read_5gram
-                       , combiner=self.j0_combiner, reducer_init=self.j0_reducer_init
-                       , reducer=self.j0_reducer, reducer_final=self.j0_reducer_final
-                       , jobconf=jobconf0
+                        , combiner=self.j0_combiner, reducer_init=self.j0_reducer_init
+                        , reducer=self.j0_reducer, reducer_final=self.j0_reducer_final
+                        , jobconf=jobconf0
                       )
-                ######## job 1: get inverted index ########
-                ,MRStep(mapper=self.j1_mapper
-                       , combiner=self.j1_combiner, reducer_init=self.j1_reducer_init
-                       , reducer=self.j1_reducer, reducer_final=self.j1_reducer_final
-                       , jobconf=jobconf1
+                ######## job 1: get inverted indexing ########
+                ,MRStep(mapper=self.j1_mapper_cosine                
+                        , reducer_init=self.j1_reducer_init
+                        , reducer=self.j1_reducer, reducer_final=self.j1_reducer_final
+                        , jobconf=jobconf1
                       )
                 ######## job 2: calculate pair similarity between words ########
-                ,MRStep(mapper=self.j2_mapper, combiner=self.j2_combiner
-                       , reducer_init=self.j2_reducer_init, reducer=self.j2_reducer
-                       , jobconf=jobconf2
-                       )
+                ,MRStep(mapper=self.j2_mapper, combiner=self.j2_reducer
+                        , reducer=self.j2_reducer
+                        , jobconf=jobconf2
+                      )
                 ######## job 3: sort similarities ########
                 ,MRStep(mapper=self.j3_mapper, reducer_init=self.j3_reducer_init
                         , reducer=self.j3_reducer
