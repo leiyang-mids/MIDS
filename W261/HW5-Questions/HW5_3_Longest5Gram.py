@@ -8,6 +8,7 @@ class Longest5Gram(MRJob):
         # get page id
         n_gram, cnt, p_cnt, b_cnt = line.strip().split('\t')
         yield n_gram, len(n_gram)
+        
 
     def reducer_init(self):
         self.length = 0
@@ -20,7 +21,7 @@ class Longest5Gram(MRJob):
             self.length = cnt
 
     def reducer_final(self):
-        yield self.longest, self.length
+        yield self.longest, (self.length)
 
     def steps(self):
         jobconf = {
@@ -29,7 +30,8 @@ class Longest5Gram(MRJob):
         }
 
         return [MRStep(mapper=self.mapper
-                       ,combiner_init=self.reducer_init
+                       # combiner doesn't work on EMR Hadoop-1.0.3 & AMI 2.4.2
+                       ,combiner_init=self.reducer_init 
                        ,combiner=self.reducer
                        ,combiner_final=self.reducer_final
                        ,reducer_init=self.reducer_init
