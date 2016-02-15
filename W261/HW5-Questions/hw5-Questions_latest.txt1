@@ -46,29 +46,13 @@ Please report the number of rows resulting from:
 (3) Inner joining Table Left with Table Right
 --
 
-HW 5.3 For the remainder of this assignment you will work with two datasets:
+HW 5.3  EDA of Google n-grams dataset
+For the Google n-grams dataset unit test and regression test your code using the 
+first 10 lines of the following file:
 
-### 1: unit/systems test data set: SYSTEMS TEST DATASET
-Three terms, A,B,C and their corresponding strip-docs of co-occurring terms
+googlebooks-eng-all-5gram-20090715-0-filtered.txt
 
-DocA {X:20, Y:30, Z:5}
-DocB {X:100, Y:20}
-DocC {M:5, N:20, Z:5}
-
-
-### 2: A large subset of the Google n-grams dataset
-
-https://aws.amazon.com/datasets/google-books-ngrams/
-
-which we have placed in a bucket/folder on Dropbox on s3:
-
-   https://www.dropbox.com/sh/tmqpc4o0xswhkvz/AACUifrl6wrMrlK6a3X3lZ9Ea?dl=0 
-
-   s3://filtered-5grams/
-
-For each HW 5.3 -5.5 Please unit test and system test your code with with SYSTEMS TEST DATASET and show the results. 
-Please compute the expected answer by hand and show your hand calculations. Then show the results you get with you system.
-Final show your results on the Google n-grams dataset
+Finally show your results on the Google n-grams dataset. 
 
 
 In particular, this bucket contains (~200) files (10Meg each) in the format:
@@ -78,10 +62,11 @@ In particular, this bucket contains (~200) files (10Meg each) in the format:
 Do some EDA on this dataset using mrjob, e.g., 
 
 - Longest 5-gram (number of characters)
-- Top 10 most frequent words (count), i.e., unigrams
-- Most/Least densely appearing words (count/pages_count) sorted in decreasing order of relative frequency (Hint: save to PART-000* and take the head -n 1000)
-- Distribution of 5-gram sizes (counts) sorted in decreasing order of relative frequency. (Hint: save to PART-000* and take the head -n 1000)
-OPTIONAL Question:
+- Top 10 most frequent words (please use the count information), i.e., unigrams
+- 20 Most/Least densely appearing words (count/pages_count) sorted in decreasing order of relative frequency 
+- Distribution of 5-gram sizes (character length).  E.g., count (using the count field) up how many times a 5-gram of 50 characters shows up. Plot the data graphically using a histogram.
+
+HW 5.3.1 OPTIONAL Question:
 - Plot the log-log plot of the frequency distributuion of unigrams. Does it follow power law distribution?
 
 For more background see:
@@ -89,13 +74,31 @@ https://en.wikipedia.org/wiki/Log%E2%80%93log_plot
 https://en.wikipedia.org/wiki/Power_law
 --
 
-HW 5.4  (over 2Gig of Data)
+HW 5.4  Synonym detection over 2Gig of Data
+
+For the remainder of this assignment you will work with two datasets:
+
+### 1: unit/systems test data set: SYSTEMS TEST DATASET
+Three terms, A,B,C and their corresponding strip-docs of co-occurring terms
+
+DocA {X:20, Y:30, Z:5}
+DocB {X:100, Y:20}
+DocC {M:5, N:20, Z:5}
+
+
+### 2: A large subset of the Google n-grams dataset as was described above
+
+For each HW 5.4 -5.5 Please unit test and system test your code with respect 
+to SYSTEMS TEST DATASET and show the results. 
+Please compute the expected answer by hand and show your hand calculations for the 
+SYSTEMS TEST DATASET. Then show the results you get with you system.
+
 In this part of the assignment we will focus on developing methods
 for detecting synonyms, using the Google 5-grams dataset. To accomplish
 this you must script two main tasks using MRJob:
 
-(1) Build stripes of word co-ocurrence for the top 10,000 using the words ranked from 9001,-10,000 as a basis
-most frequently appearing words across the entire set of 5-grams,
+(1) Build stripes for the most frequent 10,000 words using cooccurence informationa based on
+the words ranked from 1001,-10,000 as a basis/vocabulary (drop stopword-like terms),
 and output to a file in your bucket on s3 (bigram analysis, though the words are non-contiguous).
 
 (2) Using two (symmetric) comparison methods of your choice 
@@ -139,7 +142,7 @@ since your choice of association will be symmetric.
 
 Please use the inverted index (discussed in live session #5) based pattern to compute the pairwise (term-by-term) similarity matrix. 
 
-HW 5.5
+HW 5.5 Evaluation of synonyms that your discovered
 In this part of the assignment you will evaluate the success of you synonym detector.
 Take the top 1,000 closest/most similar/correlative pairs of words as determined
 by your measure in (2), and use the synonyms function in the accompanying
