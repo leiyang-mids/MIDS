@@ -7,23 +7,15 @@ class Distribution5Gram(MRJob):
     def mapper(self, _, line):
         # get counts
         n_gram, cnt, p_cnt, b_cnt = line.strip().split('\t')
-        cnt = int(cnt)
-        yield '*', cnt
-        yield n_gram, cnt
+        #cnt = int(cnt)
+        #yield '*', cnt
+        #yield n_gram, cnt
+        yield len(n_gram), int(cnt)
             
-    # combiner
+    # combiner/reducer
     def combiner(self, n_gram, count):        
         yield n_gram, sum(count)
         
-    # reducer init
-    def reducer_init(self):
-        self.total = 0
-        
-    def reducer(self, n_gram, count):
-        if n_gram == '*':
-            self.total = sum(count)
-        else:
-            yield 'n', 1.0*sum(count)/self.total
         
     # job to sort the results ###########################
     def mapper_sort1(self, word, ratio):
@@ -50,9 +42,8 @@ class Distribution5Gram(MRJob):
         }
 
         return [MRStep(mapper=self.mapper                       
-                       ,combiner=self.combiner
-                       ,reducer_init=self.reducer_init
-                       ,reducer=self.reducer           
+                       ,combiner=self.combiner                       
+                       ,reducer=self.combiner           
                        ,jobconf=jobconf1
                        )
                 ,MRStep(mapper=self.mapper_sort1                
