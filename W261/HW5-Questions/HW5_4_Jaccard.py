@@ -1,6 +1,7 @@
 from mrjob.job import MRJob
 from mrjob.step import MRStep
 from math import sqrt
+from subprocess import Popen, PIPE
  
 class Jaccard(MRJob):
     
@@ -19,11 +20,19 @@ class Jaccard(MRJob):
         # emit co-occurrence matrix
         yield word, strip
             
+    # job 0 mapper_init: load our 9k favorite words, and evaluate those only
+    def j0_mapper_read_5gram_init(self):
+        localPath = '/Users/leiyang/GitHub/mids/w261/HW5-Questions/Top10kWords'
+        cat = Popen(["cat", 'Top10kWords'], stdout=PIPE)
+        self.corpus = [s.split()[0].strip('"') for s in cat.stdout]
+        
     # job 0 mapper for 5-gram: build pseudo-document (co-ocurrence matrix) & emit inverted index
     def j0_mapper_read_5gram(self, _, line):
         # parse line, get words and counts
         grams, cnt, p_cnt, b_cnt = line.strip().split('\t')
+        # only keep words from the 9k corpus
         grams = grams.lower().split(' ')
+        grams = [x for x in grams if x in self.corpus]
         n_gram = len(grams)
         # emit co-ocurrence for each pair (MUST include all pairs to have correct inverted index)
         for w1, w2 in [[grams[i], grams[j]] for i in range(n_gram) for j in range(n_gram)]:
@@ -113,7 +122,7 @@ class Jaccard(MRJob):
     # job 2 reducer - get pair similarity
     def j2_reducer(self, pair, prod):
         # calculate similarity
-        yield (pair), sum(prod)
+        yield pair, sum(prod)
             
     #################################  job 3 - rank pairwise similarities ##############################
                    
@@ -126,11 +135,24 @@ class Jaccard(MRJob):
         self.top = 300
         self.n = 0
     
-    # job 3 reducer - show top 100 pairs
+    # job 3 reducer - show top 300 pairs
     def j3_reducer(self, result, _):
         self.n += 1
         if self.n <= self.top:
             yield result
+            
+    ####
+    def j3_mapper1(self, page, count):        
+        yield ('%s__%s' %(page[0], page[1]), count), None
+       
+    def j3_reducer_init1(self):
+        self.i = 0
+        self.n_freq = 300
+    
+    def j3_reducer1(self, key, _):        
+        if self.i < self.n_freq:
+            self.i += 1
+            yield key     
             
     #################################  mrjob definition ##############################    
     # MapReduce steps
@@ -139,31 +161,31 @@ class Jaccard(MRJob):
             #'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
             #'mapreduce.partition.keycomparator.options':  '-k2,2', # '-k1,1r -k2,2r', # no need to sort            
             'mapreduce.partition.keypartitioner.options': '-k1,1',            
-            'mapreduce.job.maps': '5',
-            'mapreduce.job.reduces': '4', # on local cluster partitioner setting doesn't work, neither on EMR!!!
+            'mapreduce.job.maps': '3',
+            'mapreduce.job.reduces': '3', 
             'stream.num.map.output.key.fields': '2',
             'mapreduce.map.output.key.field.separator': ' ',
             'stream.map.output.field.separator': ' ',
         }
         jobconf1 = {  #key value pairs            
-            'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
+            #'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
             #'mapreduce.partition.keycomparator.options': '-k1,1r -k2,2r', # no need to sort            
             'mapreduce.partition.keypartitioner.options': '-k1,1',            
-            'mapreduce.job.maps': '5',
-            'mapreduce.job.reduces': '1', # on local cluster partitioner setting doesn't work 
+            'mapreduce.job.maps': '3',
+            'mapreduce.job.reduces': '3',
             'stream.num.map.output.key.fields': '2',
-            'mapreduce.map.output.key.field.separator': ',',
-            'stream.map.output.field.separator': '\t',
+            'mapreduce.map.output.key.field.separator': ' ',
+            'stream.map.output.field.separator': ' ',
         }
         jobconf2 = {  #key value pairs            
-            'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
+            #'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
             #'mapreduce.partition.keycomparator.options': '-k1,1r -k2,2r', # -k2,2r',
-            'mapreduce.partition.keypartitioner.options': '-k1,2',
-            'mapreduce.job.maps': '10',
-            'mapreduce.job.reduces': '10',
+            #'mapreduce.partition.keypartitioner.options': '-k1,2',
+            'mapreduce.job.maps': '3',
+            'mapreduce.job.reduces': '3',
             'stream.num.map.output.key.fields': '2',
-            'mapreduce.map.output.key.field.separator': ',',
-            'stream.map.output.field.separator': '\t',
+            'mapreduce.map.output.key.field.separator': ' ',
+            'stream.map.output.field.separator': ' ',
         }
         jobconf3 = {  #key value pairs 
             'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
@@ -171,8 +193,17 @@ class Jaccard(MRJob):
             'mapreduce.job.maps': '3',
             'mapreduce.job.reduces': '1',
             'stream.num.map.output.key.fields': '2',
-            'mapreduce.map.output.key.field.separator': ',',
-            'stream.map.output.field.separator': '\t',
+            'mapreduce.map.output.key.field.separator': ' ',
+            'stream.map.output.field.separator': ' ',
+        }
+        jobconf31 = {  #key value pairs            
+            'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
+            'mapreduce.partition.keycomparator.options': '-k2,2nr -k1,1',
+            'mapreduce.job.maps': '2',
+            'mapreduce.job.reduces': '1',
+            'stream.num.map.output.key.fields': '2',
+            'mapreduce.map.output.key.field.separator': ' ',
+            'stream.map.output.field.separator': ' ',
         }
         
         # NOTE: DO NOT use jobconf when running with Python locally
@@ -181,27 +212,27 @@ class Jaccard(MRJob):
                 ### for SYSTEMS_TEST_DATASET.txt ###
                 #MRStep(mapper=self.j0_mapper_read_test)
                 ### for n-gram file ###
-                MRStep(mapper=self.j0_mapper_read_5gram
+                MRStep(mapper_init=self.j0_mapper_read_5gram_init, mapper=self.j0_mapper_read_5gram
                         , combiner=self.j0_combiner, reducer_init=self.j0_reducer_init
                         , reducer=self.j0_reducer, reducer_final=self.j0_reducer_final
                         , jobconf=jobconf0 
                       )
                 ######## job 1: get inverted indexing ########
-                #,MRStep(mapper=self.j1_mapper_cosine                
-                #        , reducer_init=self.j1_reducer_init
-                #        , reducer=self.j1_reducer, reducer_final=self.j1_reducer_final
-                #        , jobconf=jobconf1
-                #      )
+                ,MRStep(mapper=self.j1_mapper_cosine                
+                        , reducer_init=self.j1_reducer_init
+                        , reducer=self.j1_reducer, reducer_final=self.j1_reducer_final
+                        , jobconf=jobconf1
+                      )
                 ######## job 2: calculate pair similarity between words ########
-                #,MRStep(mapper=self.j2_mapper, combiner=self.j2_reducer
-                #        , reducer=self.j2_reducer
-                #        , jobconf=jobconf2
-                #      )
+                ,MRStep(mapper=self.j2_mapper, combiner=self.j2_reducer
+                        , reducer=self.j2_reducer
+                        , jobconf=jobconf2
+                      )
                 ######## job 3: sort similarities ########
-                #,MRStep(mapper=self.j3_mapper, reducer_init=self.j3_reducer_init
-                #        , reducer=self.j3_reducer
-                #        , jobconf=jobconf3
-                #       )
+                ,MRStep(mapper=self.j3_mapper1, reducer_init=self.j3_reducer_init1
+                        , reducer=self.j3_reducer1
+                        , jobconf=jobconf31
+                       )
                ]
 
 if __name__ == '__main__':
