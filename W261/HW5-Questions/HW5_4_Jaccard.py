@@ -137,14 +137,13 @@ class Jaccard(MRJob):
     def steps(self):
         jobconf0 = {  #key value pairs            
             #'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
-            #'mapreduce.partition.keycomparator.options': '-k1,1r -k2,2r', # no need to sort            
+            #'mapreduce.partition.keycomparator.options':  '-k2,2', # '-k1,1r -k2,2r', # no need to sort            
             'mapreduce.partition.keypartitioner.options': '-k1,1',            
             'mapreduce.job.maps': '5',
             'mapreduce.job.reduces': '4', # on local cluster partitioner setting doesn't work, neither on EMR!!!
             'stream.num.map.output.key.fields': '2',
             'mapreduce.map.output.key.field.separator': ' ',
             'stream.map.output.field.separator': ' ',
-            #'partitioner': 'org.apache.hadoop.mapred.lib.KeyFieldBasedPartitioner',
         }
         jobconf1 = {  #key value pairs            
             'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
