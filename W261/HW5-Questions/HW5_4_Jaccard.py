@@ -4,6 +4,8 @@ from math import sqrt
  
 class Jaccard(MRJob):
     
+    PARTITIONER='org.apache.hadoop.mapred.lib.KeyFieldBasedPartitioner'
+    
     #################################  job 0 - create co-occurrence matrix ##############################
     
     # job 0 mapper for SYSTEMS_TEST_DATASET
@@ -130,19 +132,19 @@ class Jaccard(MRJob):
         if self.n <= self.top:
             yield result
             
-    #################################  mrjob definition ##############################
-            
+    #################################  mrjob definition ##############################    
     # MapReduce steps
     def steps(self):
         jobconf0 = {  #key value pairs            
-            'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
+            #'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
             #'mapreduce.partition.keycomparator.options': '-k1,1r -k2,2r', # no need to sort            
             'mapreduce.partition.keypartitioner.options': '-k1,1',            
             'mapreduce.job.maps': '5',
-            'mapreduce.job.reduces': '3', # on local cluster partitioner setting doesn't work 
+            'mapreduce.job.reduces': '4', # on local cluster partitioner setting doesn't work, neither on EMR!!!
             'stream.num.map.output.key.fields': '2',
-            'mapreduce.map.output.key.field.separator': ',',
-            'stream.map.output.field.separator': '\t',
+            'mapreduce.map.output.key.field.separator': ' ',
+            'stream.map.output.field.separator': ' ',
+            #'partitioner': 'org.apache.hadoop.mapred.lib.KeyFieldBasedPartitioner',
         }
         jobconf1 = {  #key value pairs            
             'mapreduce.job.output.key.comparator.class': 'org.apache.hadoop.mapreduce.lib.partition.KeyFieldBasedComparator',
@@ -183,7 +185,7 @@ class Jaccard(MRJob):
                 MRStep(mapper=self.j0_mapper_read_5gram
                         , combiner=self.j0_combiner, reducer_init=self.j0_reducer_init
                         , reducer=self.j0_reducer, reducer_final=self.j0_reducer_final
-                        , jobconf=jobconf0
+                        , jobconf=jobconf0 
                       )
                 ######## job 1: get inverted indexing ########
                 #,MRStep(mapper=self.j1_mapper_cosine                
