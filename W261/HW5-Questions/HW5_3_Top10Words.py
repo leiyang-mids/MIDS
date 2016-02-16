@@ -24,7 +24,7 @@ class Top10Words(MRJob):
         self.n = 0
         
     def reducer_sort1(self, results, dummy):        
-        if True: # self.n < self.top:
+        if self.n < self.top:
             self.n += 1
             yield results
 
