@@ -64,4 +64,81 @@ Plot the path to convergence (during training) for the weighted linear regressio
 Comment on convergence and on the mean squared error using your weighted OLS algorithm on the weighted dataset versus using the weighted OLS algorithm on the uniformly weighted dataset.
 
 
+HW6.6 Clean up notebook for GMM via EM
+
+Using the following notebook as a starting point:
+
+http://nbviewer.jupyter.org/urls/dl.dropbox.com/s/0t7985e40fovlkw/EM-GMM-MapReduce%20Design%201.ipynb 
+
+Improve this notebook as follows:
+-- Add in equations into the notebook (not images of equations) 
+-- Number the equations
+-- Make sure the equation notation matches the code and the code and comments refer to the equations numbers
+-- Comment the code
+-- Rename/Reorganize the code to make it more readable
+-- Rerun the examples similar graphics (or possibly better graphics)
+
+
+HW6.7 Implement Bernoulli Mixture Model via EM
+Implement the EM clustering algorithm to determine Bernoulli Mixture Model for discrete data in MRJob.
+
+As a unit test:
+
+
+As a test: use the same dataset from HW 4.5, the Tweet Dataset. 
+Using this data, you will implement a 1000-dimensional EM-based Bernoulli Mixture Model  algorithm in MrJob on the users
+by their 1000-dimensional word stripes/vectors using K = 4.  Repeat this experiment using your KMeans MRJob implementation fron HW4.
+Report the rand index score using the class code as ground truth label for both algorithms and comment on your findings.
+
+Here is some more information on the Tweet Dataset.
+
+Here you will use a different dataset consisting of word-frequency distributions 
+for 1,000 Twitter users. These Twitter users use language in very different ways,
+and were classified by hand according to the criteria:
+
+0: Human, where only basic human-human communication is observed.
+
+1: Cyborg, where language is primarily borrowed from other sources
+(e.g., jobs listings, classifieds postings, advertisements, etc...).
+
+2: Robot, where language is formulaically derived from unrelated sources
+(e.g., weather/seismology, police/fire event logs, etc...).
+
+3: Spammer, where language is replicated to high multiplicity
+(e.g., celebrity obsessions, personal promotion, etc... )
+
+Check out the preprints of  recent research,
+which spawned this dataset:
+
+http://arxiv.org/abs/1505.04342
+http://arxiv.org/abs/1508.01843
+
+The main data lie in the accompanying file:
+
+topUsers_Apr-Jul_2014_1000-words.txt
+
+and are of the form:
+
+USERID,CODE,TOTAL,WORD1_COUNT,WORD2_COUNT,...
+.
+.
+
+where
+
+USERID = unique user identifier
+CODE = 0/1/2/3 class code
+TOTAL = sum of the word counts
+
+Using this data, you will implement a 1000-dimensional K-means algorithm in MrJob on the users
+by their 1000-dimensional word stripes/vectors using several 
+centroid initializations and values of K.
+
+
+
+HW6.8 (Optional) 1 Million songs
+Predict the year of the song. Ask Jimi
+
+
+
+
 
