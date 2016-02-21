@@ -1,3 +1,4 @@
+
 from mrjob.job import MRJob
 from numpy import sign
 
@@ -37,18 +38,19 @@ class WeightedOLSBatchGD(MRJob):
             total_count += partial_count
             total_gradient[0] += partial_Gradient[0]
             total_gradient[1] += partial_Gradient[1]
-        yield None, [v/total_count for v in total_gradient]
+        yield None, [v/total_count/10 for v in total_gradient]
+        #yield None, total_gradient
     
     def steps(self):
         jobconf = {
-            'mapreduce.job.maps': '3',
+            'mapreduce.job.maps': '7',
             'mapreduce.job.reduces': '1',
         }
         return [self.mr(mapper_init=self.read_weightsfile,
                        mapper=self.partial_gradient,
                        mapper_final=self.partial_gradient_emit,
                        reducer=self.gradient_accumulater,
-                       jobconf=self.jobconf)] 
+                       jobconf=jobconf)] 
     
 if __name__ == '__main__':
     WeightedOLSBatchGD.run()
