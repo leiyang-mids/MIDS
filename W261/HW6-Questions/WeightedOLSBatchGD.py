@@ -23,8 +23,8 @@ class WeightedOLSBatchGD(MRJob):
         # y_hat is the predicted value given current weights
         y_hat = self.weights[0]+self.weights[1]*x
         # Update parial gradient vector with gradient form current example        
-        self.partial_Gradient[0] += (y_hat-y) #/abs(x)
-        self.partial_Gradient[1] += (y_hat-y)*x #sign(x) # simplify from (y_hat-y)*x/abs(x)
+        self.partial_Gradient[0] += (y_hat-y)/abs(x)
+        self.partial_Gradient[1] += (y_hat-y)*sign(x) # simplify from (y_hat-y)*x/abs(x)
         self.partial_count = self.partial_count + 1
             
     # Finally emit in-memory partial gradient and partial count
