@@ -1,0 +1,12 @@
+doc,hot,cocoa,beans,butter,sweet,sugar,cake,chocolate,ghana,harvest,truffles,cane,black,africa,brazil,beet,icing,forest
+1 hot chocolate cocoa beans,1,1,1,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0
+2 cocoa ghana africa ,0,1,0,0,0,0,0,0,1,0,0,0,0,1,0,0,0,0
+3 beans harvest ghana ,0,0,1,0,0,0,0,0,1,1,0,0,0,0,0,0,0,0
+4 cocoa butter ,0,1,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+5 butter truffles ,0,0,0,1,0,0,0,0,0,0,1,0,0,0,0,0,0,0
+6 sweet chocolate,0,0,0,0,1,0,0,1,0,0,0,0,0,0,0,0,0,0
+7 sweet sugar,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,0,0,0
+8 sugar cane brazil,0,0,0,0,0,1,0,0,0,0,0,1,0,0,1,0,0,0
+9 sweet sugar beet,0,0,0,0,1,1,0,0,0,0,0,0,0,0,0,1,0,0
+10 sweet cake icing,0,0,0,0,1,0,1,0,0,0,0,0,0,0,0,0,1,0
+11 cake black forest,0,0,0,0,0,0,1,0,0,0,0,0,1,0,0,0,0,1
