@@ -1,9 +1,9 @@
 from mrjob.job import MRJob
 from mrjob.step import MRStep
-from numpy import mat, zeros, shape, random, array, zeros_like, dot, linalg
+#from numpy import mat, zeros, shape, random, array, zeros_like, dot, linalg
 #from random import permutation
 import json
-from math import pi, sqrt, exp, pow
+#from math import pi, sqrt, exp, pow
 
 
 class BernoulliMixEmInit(MRJob):
@@ -28,19 +28,22 @@ class BernoulliMixEmInit(MRJob):
     
     def mapper_init(self):
         # read vocabulary 
-        with open('topUsers_Apr-Jul_2014_1000-words_summaries.txt') as f:
+        #with open('topUsers_Apr-Jul_2014_1000-words_summaries.txt') as f:
+        with open('Bernoulli_EM_Unit_Test_header.csv') as f:
             header = f.readline()
         self.corpus = [w.strip('"') for w in header.strip().split(',')][-self.options.M:]        
         # put row ID's that were chosen as seeds here, list index is the category
-        self.seed_id = ['1180025371', '249818911', '1170387523', '1689063312']
+        #self.seed_id = ['1180025371', '249818911', '1170387523', '1689063312']
+        self.seed_id = ['6 sweet chocolate', '7 sweet sugar']
         
     
     def mapper(self, _, line):
-        doc_id, label, tot, fea = line.strip().split(',', 3)
+        #doc_id, label, tot, fea = line.strip().split(',', 3)
+        doc_id, fea = line.strip().split(',', 1)
         # if this row is selected as seed
         if doc_id in self.seed_id:
             c_id = self.seed_id.index(doc_id)
-            rnk = zeros(self.options.K)
+            rnk = [0]*(self.options.K)
             rnk[c_id] = 1
             tf = map(int, fea.split(','))
             # emit for alpha_k 
