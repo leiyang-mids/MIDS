@@ -1,9 +1,6 @@
 from mrjob.job import MRJob
 from mrjob.step import MRStep
-#from numpy import mat, zeros, shape, random, array, zeros_like, dot, linalg
-#from random import permutation
 import json
-#from math import pi, sqrt, exp, pow
 
 
 class BernoulliMixEmIterate(MRJob):
@@ -23,7 +20,7 @@ class BernoulliMixEmIterate(MRJob):
         self.alpha_k = param['alpha']
         self.q_mk = param['q']
         self.K = len(self.alpha_k)
-        # read words from file
+        # read words from file: unit test and Twitter data
         #with open('topUsers_Apr-Jul_2014_1000-words_summaries.txt') as f:
         with open('Bernoulli_EM_Unit_Test_header.csv') as f:
             header = f.readline()        
@@ -39,13 +36,13 @@ class BernoulliMixEmIterate(MRJob):
         # get r_nk for incoming records, with previous parameters
         tf = map(int, fea.split(','))
         prod_tm = [1]*self.K
-        for word, freq in zip(self.corpus, tf):
-            for k in range(self.K):                
+        for word, freq in zip(self.corpus, tf):                        
+            for k in range(self.K):   
                 prod_tm[k] *= self.q_mk[word][k] if freq > 0 else (1 - self.q_mk[word][k])    
         
         numerators = [alpha*p_tm for alpha, p_tm in zip(self.alpha_k, prod_tm)]
         denominator = sum(numerators)
-        self.r_nk[doc_id] = [(n/denominator if n > 0 else 0) for n in numerators]
+        self.r_nk[doc_id] = [(n/denominator if n > 0 else 0) + 0.0001 for n in numerators]
         
         
         # emit for q_mk
@@ -53,7 +50,7 @@ class BernoulliMixEmIterate(MRJob):
             yield (k, '*'), (1, self.r_nk[doc_id][k])
         for word, freq in zip(self.corpus, tf):
             for k in range(self.K):                    
-                yield (k, word), (freq > 0, self.r_nk[doc_id][k] + 0.0001)
+                yield (k, word), (freq > 0, self.r_nk[doc_id][k]) # + 0.0001)
     
     def mapper_final(self):
         path = '/Users/leiyang/GitHub/mids/w261/HW6-Questions/rnk'

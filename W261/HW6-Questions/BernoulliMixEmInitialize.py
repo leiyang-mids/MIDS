@@ -1,9 +1,6 @@
 from mrjob.job import MRJob
 from mrjob.step import MRStep
-#from numpy import mat, zeros, shape, random, array, zeros_like, dot, linalg
-#from random import permutation
 import json
-#from math import pi, sqrt, exp, pow
 
 
 class BernoulliMixEmInit(MRJob):
@@ -84,6 +81,7 @@ class BernoulliMixEmInit(MRJob):
         #yield None, self.q_mk
         #yield None, self.alpha_k
         param = {'q':self.q_mk, 'alpha':self.alpha_k}
+        
         path = '/Users/leiyang/GitHub/mids/w261/HW6-Questions/parameters'
         with open(path, 'w') as f:
             f.write(json.dumps(param))
