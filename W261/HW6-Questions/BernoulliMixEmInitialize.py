@@ -21,22 +21,28 @@ class BernoulliMixEmInit(MRJob):
         self.add_passthrough_option(
             '--M', dest='M', default=0, type='int',
             help='M: corpus size (default 0)')
+        self.add_passthrough_option(
+            '--Test', dest='T', default=0, type='int',
+            help='Test: run unit test (default 0)')
 
     
     def mapper_init(self):
         # read vocabulary         
-        with open('topUsers_Apr-Jul_2014_1000-words_summaries.txt') as f:
-        #with open('Bernoulli_EM_Unit_Test_header.csv') as f:
+        path = 'Bernoulli_EM_Unit_Test_header.csv' if self.options.T else 'topUsers_Apr-Jul_2014_1000-words_summaries.txt'
+        with open(path) as f:        
             header = f.readline()
         self.corpus = [w.strip('"') for w in header.strip().split(',')][-self.options.M:]        
-        # put row ID's that were chosen as seeds here, list index is the category
-        self.seed_id = ['343538409', '608474726', '183322216', '1364735064']
-        #self.seed_id = ['6 sweet chocolate', '7 sweet sugar']
+        # put row ID's that were chosen as seeds here, list index is the category        
+        self.seed_id = ['6 sweet chocolate', '7 sweet sugar'] if self.options.T else ['343538409', '608474726', '183322216', '1364735064']
+        
         
     
     def mapper(self, _, line):
-        doc_id, label, tot, fea = line.strip().split(',', 3)
-        #doc_id, fea = line.strip().split(',', 1)
+        if self.options.T:
+            doc_id, fea = line.strip().split(',', 1)
+        else:
+            doc_id, label, tot, fea = line.strip().split(',', 3)
+        
         # if this row is selected as seed
         if doc_id in self.seed_id:
             c_id = self.seed_id.index(doc_id)

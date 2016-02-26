@@ -14,6 +14,11 @@ class BernoulliMixEmIterate(MRJob):
         self.numMappers = 1     #number of mappers
         self.count = 0
         
+    def configure_options(self):
+        super(BernoulliMixEmIterate, self).configure_options()        
+        self.add_passthrough_option(
+            '--Test', dest='T', default=0, type='int',
+            help='Test: run unit test (default 0)')
                 
     def mapper_init(self):
         # load q_mk and alpha_k 
@@ -23,8 +28,8 @@ class BernoulliMixEmIterate(MRJob):
         self.q_mk = param['q']
         self.K = len(self.alpha_k)
         # read words from file: unit test and Twitter data
-        with open('topUsers_Apr-Jul_2014_1000-words_summaries.txt') as f:        
-        #with open('Bernoulli_EM_Unit_Test_header.csv') as f:
+        path = 'Bernoulli_EM_Unit_Test_header.csv' if self.options.T else 'topUsers_Apr-Jul_2014_1000-words_summaries.txt'
+        with open(path) as f:                
             header = f.readline()        
         self.corpus = [w.strip('"') for w in header.strip().split(',')][-len(self.q_mk):]               
         # r_nk
@@ -32,8 +37,11 @@ class BernoulliMixEmIterate(MRJob):
         
     
     def mapper(self, _, line):
-        doc_id, label, tot, fea = line.strip().split(',', 3)
-        #doc_id, fea = line.strip().split(',', 1)
+        if self.options.T:
+            doc_id, fea = line.strip().split(',', 1)
+        else:
+            doc_id, label, tot, fea = line.strip().split(',', 3)
+        # smoothing factor
         eps = 0.0001
                
         # get r_nk for incoming records, with previous parameters
@@ -64,7 +72,7 @@ class BernoulliMixEmIterate(MRJob):
          
             
     def reducer_init(self):
-        self.K = 4 # TODO
+        self.K = 2 if self.options.T else 4
         self.alpha_k = [0]*self.K
         self.q_mk = {}
         
