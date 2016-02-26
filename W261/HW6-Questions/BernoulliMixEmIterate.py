@@ -64,7 +64,7 @@ class BernoulliMixEmIterate(MRJob):
             for k in range(self.K):                    
                 yield (k, word), (freq > 0, self.r_nk[doc_id][k])
     
-    
+    # for local debug: save r_nk for the documents processed by the mapper
     def mapper_final(self):
         path = '/Users/leiyang/GitHub/mids/w261/HW6-Questions/rnk'
         with open(path, 'w') as f:
@@ -99,21 +99,25 @@ class BernoulliMixEmIterate(MRJob):
         self.q_mk[m][k] = 1.0*sum_r_I/sum_r
         
     def reducer_final(self):
-        #yield None, self.q_mk
-        #yield None, self.alpha_k
+        # emit parameters for certain cluster(k) and word(m)
         param = {'q':self.q_mk, 'alpha':self.alpha_k}
-        path = '/Users/leiyang/GitHub/mids/w261/HW6-Questions/parameters'
-        with open(path, 'w') as f:
-            f.write(json.dumps(param))
+        yield None, param
         
-    def steps(self):        
+
+    def steps(self):     
+        jc = {  
+            'mapreduce.job.maps': '7',
+            'mapreduce.job.reduces': '3',
+        }
         return [MRStep(mapper_init=self.mapper_init
                        , mapper=self.mapper
                        , mapper_final=self.mapper_final
                        , reducer_init=self.reducer_init
                        , reducer=self.reducer
                        , reducer_final=self.reducer_final
-                      )]
+                       , jobconf = jc
+                      )
+               ]
         
 
 
