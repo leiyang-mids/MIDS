@@ -10,9 +10,7 @@ class WeightedOLSBatchGD(MRJob):
     def read_weightsfile(self):
         # Read weights file
         with open('weights.txt', 'r') as f:
-            self.weights = [float(v) for v in f.readline().split(',')]
-            #temp = f.readlines()[-1]
-            #self.weights = map(float, temp.split(','))
+            self.weights = [float(v) for v in f.readline().split(',')]            
         # Initialze gradient for this iteration
         self.partial_Gradient = [0]*len(self.weights)
         self.partial_count = 0
@@ -25,7 +23,7 @@ class WeightedOLSBatchGD(MRJob):
         # Update parial gradient vector with gradient form current example        
         self.partial_Gradient[0] += (y_hat-y)/abs(x)
         self.partial_Gradient[1] += (y_hat-y)*sign(x) # simplify from (y_hat-y)*x/abs(x)
-        self.partial_count = self.partial_count + 1
+        self.partial_count += 1
             
     # Finally emit in-memory partial gradient and partial count
     def partial_gradient_emit(self):

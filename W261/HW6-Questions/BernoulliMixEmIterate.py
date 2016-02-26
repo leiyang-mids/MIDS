@@ -1,6 +1,7 @@
 from mrjob.job import MRJob
 from mrjob.step import MRStep
 from math import log, exp
+from scipy.misc import logsumexp
 import json
 
 
@@ -12,8 +13,8 @@ class BernoulliMixEmIterate(MRJob):
         
         self.numMappers = 1     #number of mappers
         self.count = 0
+        
                 
-    
     def mapper_init(self):
         # load q_mk and alpha_k 
         with open('parameters') as f:
@@ -22,8 +23,8 @@ class BernoulliMixEmIterate(MRJob):
         self.q_mk = param['q']
         self.K = len(self.alpha_k)
         # read words from file: unit test and Twitter data
-        #with open('topUsers_Apr-Jul_2014_1000-words_summaries.txt') as f:
-        with open('Bernoulli_EM_Unit_Test_header.csv') as f:
+        with open('topUsers_Apr-Jul_2014_1000-words_summaries.txt') as f:        
+        #with open('Bernoulli_EM_Unit_Test_header.csv') as f:
             header = f.readline()        
         self.corpus = [w.strip('"') for w in header.strip().split(',')][-len(self.q_mk):]               
         # r_nk
@@ -31,8 +32,8 @@ class BernoulliMixEmIterate(MRJob):
         
     
     def mapper(self, _, line):
-        #doc_id, label, tot, fea = line.strip().split(',', 3)
-        doc_id, fea = line.strip().split(',', 1)
+        doc_id, label, tot, fea = line.strip().split(',', 3)
+        #doc_id, fea = line.strip().split(',', 1)
         eps = 0.0001
                
         # get r_nk for incoming records, with previous parameters
@@ -43,18 +44,18 @@ class BernoulliMixEmIterate(MRJob):
                 q = self.q_mk[word][k]
                 prod_tm[k] += log((q if freq > 0 else (1 - q)) + eps)
         
-        numerators = [alpha*exp(p_tm) for alpha, p_tm in zip(self.alpha_k, prod_tm)]
-        denominator = sum(numerators)
-        #self.r_nk[doc_id] = [(n/denominator if n > 0 else 0) for n in numerators]
-        self.r_nk[doc_id] = [n/denominator for n in numerators]
-        
-        
+        log_beta = [log(alpha)+p_tm for alpha, p_tm in zip(self.alpha_k, prod_tm)]    
+        lse = logsumexp(log_beta)
+        log_rnk = [lb - lse for lb in log_beta]
+        self.r_nk[doc_id] = [exp(x) for x in log_rnk]
+                
         # emit for q_mk
         for k in range(self.K):
             yield (k, '*'), (1, self.r_nk[doc_id][k])
         for word, freq in zip(self.corpus, tf):
             for k in range(self.K):                    
                 yield (k, word), (freq > 0, self.r_nk[doc_id][k])
+    
     
     def mapper_final(self):
         path = '/Users/leiyang/GitHub/mids/w261/HW6-Questions/rnk'
@@ -63,7 +64,7 @@ class BernoulliMixEmIterate(MRJob):
          
             
     def reducer_init(self):
-        self.K = 2 # TODO
+        self.K = 4 # TODO
         self.alpha_k = [0]*self.K
         self.q_mk = {}
         
