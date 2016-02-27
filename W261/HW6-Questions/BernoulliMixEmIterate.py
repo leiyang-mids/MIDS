@@ -2,17 +2,15 @@ from mrjob.job import MRJob
 from mrjob.step import MRStep
 from math import log, exp
 from scipy.misc import logsumexp
-import json
+from json import dumps, loads
 
 
 class BernoulliMixEmIterate(MRJob):
     DEFAULT_PROTOCOL = 'json'
+    PARTITIONER = 'org.apache.hadoop.mapred.lib.KeyFieldBasedPartitioner'
     
     def __init__(self, *args, **kwargs):
         super(BernoulliMixEmIterate, self).__init__(*args, **kwargs)
-        
-        self.numMappers = 1     #number of mappers
-        self.count = 0
         
     def configure_options(self):
         super(BernoulliMixEmIterate, self).configure_options()        
@@ -23,7 +21,7 @@ class BernoulliMixEmIterate(MRJob):
     def mapper_init(self):
         # load q_mk and alpha_k 
         with open('parameters') as f:
-            param = json.loads(f.read())
+            param = loads(f.read())
         self.alpha_k = param['alpha']
         self.q_mk = param['q']
         self.K = len(self.alpha_k)
@@ -64,11 +62,11 @@ class BernoulliMixEmIterate(MRJob):
             for k in range(self.K):                    
                 yield (k, word), (freq > 0, self.r_nk[doc_id][k])
     
-    # for local debug: save r_nk for the documents processed by the mapper
+    # for local debug, or prediction
     def mapper_final(self):
         path = '/Users/leiyang/GitHub/mids/w261/HW6-Questions/rnk'
         with open(path, 'w') as f:
-            f.write(json.dumps(self.r_nk))
+            f.write(dumps(self.r_nk))
          
             
     def reducer_init(self):
@@ -105,9 +103,16 @@ class BernoulliMixEmIterate(MRJob):
         
 
     def steps(self):     
-        jc = {  
+        jc = {
+            # it is really unnecessary to use key field based partition
+            # as r_nk (for each k) may be processed by different reduces, 
+            # but the element to calculate one r_nk will always go to the same reducer
+            #'mapreduce.partition.keypartitioner.options': '-k1,1',            
             'mapreduce.job.maps': '7',
-            'mapreduce.job.reduces': '3',
+            'mapreduce.job.reduces': '4',
+            #'stream.num.map.output.key.fields': '2',
+            #'mapreduce.map.output.key.field.separator': ' ',
+            #'stream.map.output.field.separator': ' ',
         }
         return [MRStep(mapper_init=self.mapper_init
                        , mapper=self.mapper

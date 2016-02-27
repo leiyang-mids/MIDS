@@ -1,6 +1,6 @@
 from mrjob.job import MRJob
 from mrjob.step import MRStep
-import json
+from json import dumps
 
 
 class BernoulliMixEmInit(MRJob):
@@ -8,9 +8,6 @@ class BernoulliMixEmInit(MRJob):
     
     def __init__(self, *args, **kwargs):
         super(BernoulliMixEmInit, self).__init__(*args, **kwargs)
-        
-        self.numMappers = 1     #number of mappers
-        self.count = 0
         
                                                  
     def configure_options(self):
@@ -36,7 +33,6 @@ class BernoulliMixEmInit(MRJob):
         self.seed_id = ['6 sweet chocolate', '7 sweet sugar'] if self.options.T else ['343538409', '608474726', '183322216', '1364735064']
         
         
-    
     def mapper(self, _, line):
         if self.options.T:
             doc_id, fea = line.strip().split(',', 1)
@@ -84,22 +80,26 @@ class BernoulliMixEmInit(MRJob):
         self.q_mk[m][k] = 1.0*sum_r_I/sum_r
         
     def reducer_final(self):
-        #yield None, self.q_mk
-        #yield None, self.alpha_k
+        # save initial parameters
         param = {'q':self.q_mk, 'alpha':self.alpha_k}
-        
         path = '/Users/leiyang/GitHub/mids/w261/HW6-Questions/parameters'
         with open(path, 'w') as f:
-            f.write(json.dumps(param))
+            f.write(dumps(param))
         
     def steps(self):
-        # TODO: set partition on k only, so all words
+        # initial scan of the data - no big deal
+        jc = {  
+            'mapreduce.job.maps': '2',
+            'mapreduce.job.reduces': '1',
+        }
         return [MRStep(mapper_init=self.mapper_init
                        , mapper=self.mapper
                        , reducer_init=self.reducer_init
                        , reducer=self.reducer
                        , reducer_final=self.reducer_final
-                      )]
+                       , jobconf = jc
+                      )
+               ]
         
 
 
