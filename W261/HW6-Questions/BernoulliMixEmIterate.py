@@ -108,8 +108,8 @@ class BernoulliMixEmIterate(MRJob):
             # as r_nk (for each k) may be processed by different reduces, 
             # but the element to calculate one r_nk will always go to the same reducer
             #'mapreduce.partition.keypartitioner.options': '-k1,1',            
-            'mapreduce.job.maps': '7',
-            'mapreduce.job.reduces': '4',
+            'mapreduce.job.maps': '1',
+            'mapreduce.job.reduces': '1',
             #'stream.num.map.output.key.fields': '2',
             #'mapreduce.map.output.key.field.separator': ' ',
             #'stream.map.output.field.separator': ' ',
