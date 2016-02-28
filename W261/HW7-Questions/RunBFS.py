@@ -76,7 +76,7 @@ while(1):
     dist_old = dist
     i += 1
         
-print "\nTraining completes!\n"
+print "Traversing completes!\n"
 
 # show path between source and destination
 with open('graph', 'r') as f:
