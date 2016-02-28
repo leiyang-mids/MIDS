@@ -2,15 +2,15 @@ from mrjob.job import MRJob
 from mrjob.step import MRStep
 
 
-class ShortestPathIter(MRJob):
+class UnweightedShortestPathIter(MRJob):
     DEFAULT_PROTOCOL = 'json'
     
     def __init__(self, *args, **kwargs):
-        super(ShortestPathIter, self).__init__(*args, **kwargs)
+        super(UnweightedShortestPathIter, self).__init__(*args, **kwargs)
         
                                                  
     def configure_options(self):
-        super(ShortestPathIter, self).configure_options()
+        super(UnweightedShortestPathIter, self).configure_options()
         self.add_passthrough_option(
             '--source', dest='source', default='1', type='string',
             help='source: source node (default 1)')        
@@ -21,16 +21,14 @@ class ShortestPathIter(MRJob):
         exec cmd        
         # if the node structure is incomplete (first pass), add them                
         if 'dist' not in node:            
-            node = {'adj':node, 'path':[]}            
+            node = {'adj':node.keys(), 'path':[]}            
             node['dist'] = 0 if self.options.source==nid else -1            
         # emit node
         yield nid, node        
         # emit distances to reachable nodes
         if node['dist'] >= 0:
-            for m in node['adj']:                
-                ##### for regular weighted dataset
-                #yield m, {'dd':node['adj'][m] + node['dist'], 'pp':node['path']+[nid]}
-                ##### for wikipedia dataset, no weight
+            for m in node['adj']:                                
+                ##### for unweighted network #####
                 yield m, {'dd':1 + node['dist'], 'pp':node['path']+[nid]}
                 
     def reducer(self, nid, value):
@@ -45,7 +43,7 @@ class ShortestPathIter(MRJob):
                 path = v['pp']
         # handle dangling node
         if not node:
-            node = {'adj':{}, 'dist':dmin, 'path':path}
+            node = {'adj':[], 'dist':dmin, 'path':path}
         # update distance and path
         if (node['dist'] == -1 and path) or dmin < node['dist']:
             node['dist'] = dmin
@@ -60,11 +58,10 @@ class ShortestPathIter(MRJob):
         }
         return [MRStep(mapper=self.mapper
                        , combiner=self.reducer
-                       , reducer=self.reducer
-                       #, reducer_final=self.reducer_final
-                       #, jobconf = jc
+                       , reducer=self.reducer                       
+                       , jobconf = jc
                       )
                ]
 
 if __name__ == '__main__':
-    ShortestPathIter.run()
+    UnweightedShortestPathIter.run()
