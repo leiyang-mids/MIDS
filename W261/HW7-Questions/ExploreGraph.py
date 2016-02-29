@@ -7,33 +7,36 @@ class ExploreGraph(MRJob):
     
     def __init__(self, *args, **kwargs):
         super(ExploreGraph, self).__init__(*args, **kwargs)
-        
-                                                 
-    def configure_options(self):
-        super(ExploreGraph, self).configure_options()
-        self.add_passthrough_option(
-            '--source', dest='source', default='1', type='string',
-            help='source: source node (default 1)')        
 
+    # assuming we are dealing with directed graph
+    # this job can handle undirected graph as well, 
+    # but it can be done more efficiently
     def mapper(self, _, line):
         nid, dic = line.strip().split('\t', 1)
         cmd = 'adj = %s' %dic
         exec cmd        
-        # let's emit the node degree as key, this way we can do some aggregation
-        # value: number of nodes
-        yield len(adj), 1
+        # we need to emit node ID as key, in order to count dangling nodes
+        # the value emitted here is (out, in) degree for the node
+        yield nid, (len(adj), 0)
+        # emit in degree
+        for n in adj:
+            yield n, (0, 1)
                         
-    def combiner(self, degree, cnt):
-        yield degree, sum(cnt)
+    def combiner(self, nid, deg):
+        din = dout = 0
+        for n_out, n_in in deg[0], deg[1]:
+            din += n_in
+            dout += n_out
+        yield nid, sum(dout, din)
         
     def reducer_init(self):
-        self.degree_cnt = {}
+        self.node_cnt = 0
+        self.total_deg = 0
         
-    def reducer(self, degree, cnt):
-        if degree not in self.degree_cnt:
-            self.degree_cnt[degree] = sum(cnt)
-        else:
-            self.degree_cnt[degree] += sum(cnt)
+    def reducer(self, node, degree):
+        self.node_cnt += 1
+        self.total_deg += sum(degree)
+        yield node, tot
             
     def reducer_final(self):
         # final aggregation
