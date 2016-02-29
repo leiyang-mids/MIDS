@@ -13,7 +13,10 @@ class UnweightedShortestPathIter(MRJob):
         super(UnweightedShortestPathIter, self).configure_options()
         self.add_passthrough_option(
             '--source', dest='source', default='1', type='string',
-            help='source: source node (default 1)')        
+            help='source: source node (default 1)') 
+        self.add_passthrough_option(
+            '--destination', dest='destination', default='1', type='string',
+            help='destination: destination node (default 1)') 
 
     def mapper(self, _, line):
         nid, dic = line.strip().split('\t', 1)
@@ -42,8 +45,10 @@ class UnweightedShortestPathIter(MRJob):
                 dmin = v['dd']
                 path = v['pp']
         # handle dangling node
-        if not node:
+        if not node and nid == self.options.destination:
             node = {'adj':[], 'dist':dmin, 'path':path}
+        elif not node:
+            return
         # update distance and path
         if (node['dist'] == -1 and path) or dmin < node['dist']:
             node['dist'] = dmin
