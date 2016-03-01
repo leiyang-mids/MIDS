@@ -10,14 +10,14 @@ if __name__ == "__main__":
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hg:s:d:m:")
     except getopt.GetoptError:
-        print 'RunBFS.py -g <graph> -s <source> -d <destination> -m <mode>'
+        print 'RunUnweightedBFS.py -g <graph> -s <source> -d <destination> -m <mode>'
         sys.exit(2)
     if len(opts) != 4:
-        print 'RunBFS.py -g <graph> -s <source> -d <destination> -m <mode>'
+        print 'RunUnweightedBFS.py -g <graph> -s <source> -d <destination> -m <mode>'
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print 'RunBFS.py -g <graph> -s <source> -d <destination> -m <mode>'
+            print 'RunUnweightedBFS.py -g <graph> -s <source> -d <destination> -m <mode>'
             sys.exit(2)
         elif opt == '-g':
             graph = arg
@@ -49,6 +49,7 @@ with init_job.make_runner() as runner:
 i = 1
 while(1):    
     print 'iteration %s' %i    
+    fileName = 'shortest_%s_%s' %(source, destination)
     stop = False
     with iter_job.make_runner() as runner: 
         runner.run()
@@ -57,10 +58,15 @@ while(1):
             for line in runner.stream_output():
                 # value is nid and node object
                 nid, node = iter_job.parse_output_line(line)                
-                f.write('%s\t%s\n' %(nid, str(node)))
+                # if the destination is reached, save results and quit
                 if nid == destination and node['dist'] > 0:
+                    with open(fileName) as s:
+                        s.write('%s\t%s\n' %(nid, str(node)))
                     stop = True
                     break
+                else:
+                    # otherwise write to file for next iteration
+                    f.write('%s\t%s\n' %(nid, str(node)))
     
     if stop:
         break
@@ -68,19 +74,3 @@ while(1):
     i += 1
         
 print "Traversing completes!\n"
-
-# show path between source and destination
-with open('graph', 'r') as f:
-    line = f.readline()
-    while (line):
-        nid, node = line.split('\t')
-        if nid == destination:
-            cmd = 'node = %s' %node
-            exec cmd
-            if node['path']:
-                print 'shortest distance between %s and %s: %s' %(source, destination, node['dist'])
-                print 'path: %s' %' -> '.join(node['path']+[destination])
-            else:
-                print '%s is a dangling node, cannot traverse from it!' %source
-            break
-        line = f.readline()

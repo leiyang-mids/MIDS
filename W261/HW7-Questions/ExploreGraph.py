@@ -18,34 +18,50 @@ class ExploreGraph(MRJob):
         # we need to emit node ID as key, in order to count dangling nodes
         # the value emitted here is (out, in) degree for the node
         yield nid, (len(adj), 0)
-        # emit in degree
+        # emit in degree from adjacency list
         for n in adj:
             yield n, (0, 1)
                         
     def combiner(self, nid, deg):
         din = dout = 0
-        for n_out, n_in in deg[0], deg[1]:
-            din += n_in
-            dout += n_out
-        yield nid, sum(dout, din)
+        for d in deg:            
+            dout += d[0]
+            din += d[1]            
+        yield nid, (dout, din)
         
     def reducer_init(self):
         self.node_cnt = 0
-        self.total_deg = 0
+        self.out_deg = {}
+        self.in_deg = {}
         
-    def reducer(self, node, degree):
+    def reducer(self, node, deg):
+        # add node by 1
         self.node_cnt += 1
-        self.total_deg += sum(degree)
-        yield node, tot
+        # aggregate in/out degree
+        _out = _in = 0
+        for d in deg:            
+            _out += d[0]
+            _in += d[1]    
+        # accumulate degree distribution
+        if _out not in self.out_deg:
+            self.out_deg[_out] = 1
+        else:
+            self.out_deg[_out] += 1
+        if _in not in self.in_deg:
+            self.in_deg[_in] = 1
+        else:
+            self.in_deg[_in] += 1
+        
             
     def reducer_final(self):
-        # final aggregation
-        tot_node = sum(self.degree_cnt.values())
-        tot_degree = sum([d*self.degree_cnt[d] for d in self.degree_cnt])
-        yield 'total nodes: ', tot_node
-        yield 'total links: ', tot_degree/2
-        yield 'average degree: ', 1.0*tot_degree/tot_node
-        yield 'degree counts: ', self.degree_cnt        
+        # final aggregation        
+        tot_degree = sum([d*self.out_deg[d] for d in self.out_deg])
+        yield 'total nodes: ', self.node_cnt
+        yield 'total links: ', tot_degree
+        yield 'average in degree: ', 1.0*tot_degree/sum(self.in_deg.values())
+        yield 'average out degree: ', 1.0*tot_degree/sum(self.out_deg.values())
+        yield 'dist of in-degree: ', self.in_deg
+        yield 'dist of out-degree: ', self.out_deg
         
     def steps(self):
         jc = {
@@ -57,7 +73,7 @@ class ExploreGraph(MRJob):
                        , reducer_init=self.reducer_init
                        , reducer=self.reducer                       
                        , reducer_final=self.reducer_final
-                       , jobconf = jc
+                       #, jobconf = jc
                       )
                ]
 

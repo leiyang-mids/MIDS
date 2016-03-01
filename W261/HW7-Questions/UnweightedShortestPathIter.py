@@ -30,9 +30,8 @@ class UnweightedShortestPathIter(MRJob):
         yield nid, node        
         # emit distances to reachable nodes
         if node['dist'] >= 0:
-            for m in node['adj']:                                
-                ##### for unweighted network #####
-                yield m, {'dd':1 + node['dist'], 'pp':node['path']+[nid]}
+            for m in node['adj']:                     
+                yield m, {'dd':(1+node['dist']), 'pp':(node['path']+[nid])}
                 
     def reducer(self, nid, value):
         dmin = float('inf')
@@ -44,10 +43,10 @@ class UnweightedShortestPathIter(MRJob):
             elif v['dd'] < dmin:
                 dmin = v['dd']
                 path = v['pp']
-        # handle dangling node
+        # handle dangling node, we only care if it's destination
         if not node and nid == self.options.destination:
             node = {'adj':[], 'dist':dmin, 'path':path}
-        elif not node:
+        elif not node and nid != self.options.destination:
             return
         # update distance and path
         if (node['dist'] == -1 and path) or dmin < node['dist']:
