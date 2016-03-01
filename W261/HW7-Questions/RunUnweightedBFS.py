@@ -30,8 +30,8 @@ if __name__ == "__main__":
         
 
 # creat BFS job
-init_job = UnweightedShortestPathIter(args=[graph, '--source', source, '-r', mode])
-iter_job = UnweightedShortestPathIter(args=['graph', '--source', source, '-r', mode])
+init_job = UnweightedShortestPathIter(args=[graph, '--source', source, '--destination', destination, '-r', mode])
+iter_job = UnweightedShortestPathIter(args=['graph', '--source', source, '--destination', destination, '-r', mode])
 
 # run initialization job
 with init_job.make_runner() as runner:
@@ -49,7 +49,7 @@ with init_job.make_runner() as runner:
 i = 1
 while(1):    
     print 'iteration %s' %i    
-    fileName = 'shortest_%s_%s' %(source, destination)
+    fileName = 'shortest_path_%s_%s' %(source, destination)
     stop = False
     with iter_job.make_runner() as runner: 
         runner.run()
@@ -71,6 +71,6 @@ while(1):
     if stop:
         break
     # more iteration needed
-    i += 1
+    i += 1    
         
 print "Traversing completes!\n"
