@@ -8,7 +8,6 @@ class UnweightedShortestPathIter(MRJob):
     def __init__(self, *args, **kwargs):
         super(UnweightedShortestPathIter, self).__init__(*args, **kwargs)
 
-
     def configure_options(self):
         super(UnweightedShortestPathIter, self).configure_options()
         self.add_passthrough_option(
@@ -45,14 +44,18 @@ class UnweightedShortestPathIter(MRJob):
                 dmin = v['dd']
                 path = v['pp']
         # handle dangling node, we only care if it's destination
-        if not node and nid == self.options.destination:
-            node = {'adj':[], 'dist':dmin, 'path':path}
-        elif not node and nid != self.options.destination:
-            return
-        # update distance and path
-        if (node['dist'] == -1 and path) or dmin < node['dist']:
-            node['dist'] = dmin
-            node['path'] = path
+        isDestination = nid == self.options.destination
+        if not node:
+            if isDestination:
+                node = {'adj':[], 'dist':dmin, 'path':path}
+            else:
+                return
+        elif (node['dist'] == -1 and path) or dmin < node['dist']:
+            node['dist'], node['path'] = dmin, path
+             
+        # set the counter so we can stop iteration after the job is done
+        if isDestination and node['dist'] > 0:
+            self.increment_counter('unweighted', 'reached', 1)
         # emit for next iteration
         yield nid, node
 
@@ -63,6 +66,7 @@ class UnweightedShortestPathIter(MRJob):
         }
         return [MRStep(mapper=self.mapper
                        , combiner=self.reducer
+                       , reducer_init=self.reducer_init
                        , reducer=self.reducer
                        , jobconf = jc
                       )

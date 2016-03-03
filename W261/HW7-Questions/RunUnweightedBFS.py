@@ -55,19 +55,19 @@ while(1):
     with iter_job.make_runner() as runner:
         print str(datetime.datetime.now()) + ': running iteration %d ...' %i
         runner.run()
-    # check if destination is reached
-    print str(datetime.datetime.now()) + ': checking if destination is reached ...'
-    with stop_job.make_runner() as runner:
-        runner.run()
-        for line in runner.stream_output():
-            text, path = stop_job.parse_output_line(line)
-            if text == 'destination reached':
-                stop = True
-                result = '\nshortest path: %s' %(' -> '.join(path+[destination]))
-                break
+        # check if destination is reached
+        stop = runner.counters()['unweighted']['reached'] == 1
 
+    # if destination reached, get path and break out
     if stop:
+        print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'
+        with stop_job.make_runner() as runner:
+            runner.run()
+            for line in runner.stream_output():
+                text, path = stop_job.parse_output_line(line)
+                result = '\nshortest path: %s' %(' -> '.join(path+[destination]))
         break
+
     # more iteration needed
     i += 1
     print str(datetime.datetime.now()) + ': moving results for next initialization ...'
@@ -75,7 +75,7 @@ while(1):
     call(['hdfs', 'dfs', '-mv', '/user/leiyang/wiki_out', '/user/leiyang/wiki_in'])
 
 # clear results
-print str(datetime.datetime.now()) + ': destination reached, clearing files ...'
+print str(datetime.datetime.now()) + ': clearing files ...'
 call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/wiki*'])
 
 print str(datetime.datetime.now()) + ": traversing completes!"
