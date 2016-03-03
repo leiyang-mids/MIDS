@@ -20,6 +20,7 @@ class UnweightedShortestPathIter(MRJob):
 
     def mapper(self, _, line):
         nid, dic = line.strip().split('\t', 1)
+        nid = nid.strip('"')
         cmd = 'node = %s' %dic
         exec cmd        
         # if the node structure is incomplete (first pass), add them                
@@ -57,8 +58,8 @@ class UnweightedShortestPathIter(MRJob):
         
     def steps(self):
         jc = {
-            'mapreduce.job.maps': '10',
-            'mapreduce.job.reduces': '10',
+            'mapreduce.job.maps': '1',
+            'mapreduce.job.reduces': '1',
         }
         return [MRStep(mapper=self.mapper
                        , combiner=self.reducer

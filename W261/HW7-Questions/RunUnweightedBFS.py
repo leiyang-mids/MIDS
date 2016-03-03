@@ -1,7 +1,7 @@
 #!/usr/bin/python
-#%load_ext autoreload
-#%autoreload 2
 from UnweightedShortestPathIter import UnweightedShortestPathIter
+from isDestinationReached import isDestinationReached
+from subprocess import call
 import sys, getopt
 
 # parse parameter
@@ -30,47 +30,53 @@ if __name__ == "__main__":
         
 
 # creat BFS job
-init_job = UnweightedShortestPathIter(args=[graph, '--source', source, '--destination', destination, '-r', mode])
-iter_job = UnweightedShortestPathIter(args=['graph', '--source', source, '--destination', destination, '-r', mode])
+init_job = UnweightedShortestPathIter(args=[graph, '--source', source, '--destination', destination, 
+                                            '-r', mode, '--output-dir', 'hdfs:///user/leiyang/wiki_out'])
+                                            
+iter_job = UnweightedShortestPathIter(args=['hdfs:///user/leiyang/wiki_in/part*', '--source', source, '--destination', 
+                                            destination, '-r', mode, '--output-dir', 'hdfs:///user/leiyang/wiki_out'])
+                                            
+stop_job = isDestinationReached(args=['hdfs:///user/leiyang/wiki_out/part*', '--source', source, '--destination', 
+                                            destination, '-r', mode])
 
 # run initialization job
 with init_job.make_runner() as runner:
+    print 'starting initialization job ...'
     runner.run()    
-    # save our graph file for iteration
-    with open('graph', 'w') as f:
-        for line in runner.stream_output():
-            # value is nid and node object
-            nid, node = init_job.parse_output_line(line)            
-            # write graph file 
-            f.write('%s\t%s\n' %(nid, node))
+# move the result to input folder
+print 'moving results for next initialization ...'
+call(['hdfs', 'dfs', '-mv', '/user/leiyang/wiki_out', '/user/leiyang/wiki_in'])
+    
 
 # run BFS iteratively
-
 i = 1
-while(1):    
-    print 'iteration %s' %i    
-    fileName = 'shortest_path_%s_%s' %(source, destination)
+while(1):            
     stop = False
     with iter_job.make_runner() as runner: 
+        print 'running iteration %d ...' %i
         runner.run()
-        # stream_output: get access of the output    
-        with open('graph', 'w') as f:
-            for line in runner.stream_output():
-                # value is nid and node object
-                nid, node = iter_job.parse_output_line(line)                
-                # if the destination is reached, save results and quit
-                if nid == destination and node['dist'] > 0:
-                    with open(fileName) as s:
-                        s.write('%s\t%s\n' %(nid, str(node)))
-                    stop = True
-                    break
-                else:
-                    # otherwise write to file for next iteration
-                    f.write('%s\t%s\n' %(nid, str(node)))
+    # check if destination is reached
+    print 'checking if destination is reached ...'
+    with stop_job.make_runner() as runner:
+        runner.run()
+        for line in runner.stream_output():
+            text, path = stop_job.parse_output_line(line)
+            if text == 'destination reached':
+                stop = True
+                result = '\nshortest path: %s' %(' -> '.join(path+[destination]))
+                break
     
     if stop:
         break
     # more iteration needed
     i += 1    
-        
-print "Traversing completes!\n"
+    print 'moving results for next initialization ...'
+    call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/wiki_in'])
+    call(['hdfs', 'dfs', '-mv', '/user/leiyang/wiki_out', '/user/leiyang/wiki_in'])
+
+# clear results
+print 'Destination reached, clearing files ...'
+call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/wiki*'])
+    
+print "Traversing completes!"
+print result
