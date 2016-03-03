@@ -20,18 +20,21 @@ class isDestinationReached(MRJob):
     def mapper_init(self):
         self.reached = False
         self.path = None
+        self.checked = False
 
     def mapper(self, _, line):
-        if self.reached:
+        if self.checked:
             return
         nid, dic = line.strip().split('\t', 1)
-        nid = nid.strip('"')
-        cmd = 'node = %s' %dic
-        exec cmd
+        #nid = nid.strip('"')
         # emit distances to reachable nodes
-        if nid == self.options.destination and node['dist'] > 0:
-            self.reached = True
-            self.path = node['path']
+        if nid.strip('"') == self.options.destination:
+            self.checked = True
+            cmd = 'node = %s' %dic            
+            exec cmd
+            if node['dist'] > 0:
+                self.reached = True
+                self.path = node['path']
 
     def mapper_final(self):
         yield "destination reached" if self.reached else "keep working", self.path

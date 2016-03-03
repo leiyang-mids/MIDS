@@ -2,11 +2,11 @@
 from UnweightedShortestPathIter import UnweightedShortestPathIter
 from isDestinationReached import isDestinationReached
 from subprocess import call
-import sys, getopt
+import sys, getopt, datetime
 
 # parse parameter
 if __name__ == "__main__":
-    
+
     try:
         opts, args = getopt.getopt(sys.argv[1:], "hg:s:d:m:")
     except getopt.GetoptError:
@@ -27,36 +27,36 @@ if __name__ == "__main__":
             destination = arg
         elif opt == '-m':
             mode = arg
-        
+
 
 # creat BFS job
-init_job = UnweightedShortestPathIter(args=[graph, '--source', source, '--destination', destination, 
+init_job = UnweightedShortestPathIter(args=[graph, '--source', source, '--destination', destination,
                                             '-r', mode, '--output-dir', 'hdfs:///user/leiyang/wiki_out'])
-                                            
-iter_job = UnweightedShortestPathIter(args=['hdfs:///user/leiyang/wiki_in/part*', '--source', source, '--destination', 
+
+iter_job = UnweightedShortestPathIter(args=['hdfs:///user/leiyang/wiki_in/part*', '--source', source, '--destination',
                                             destination, '-r', mode, '--output-dir', 'hdfs:///user/leiyang/wiki_out'])
-                                            
-stop_job = isDestinationReached(args=['hdfs:///user/leiyang/wiki_out/part*', '--source', source, '--destination', 
+
+stop_job = isDestinationReached(args=['hdfs:///user/leiyang/wiki_out/part*', '--source', source, '--destination',
                                             destination, '-r', mode])
 
 # run initialization job
 with init_job.make_runner() as runner:
-    print 'starting initialization job ...'
-    runner.run()    
+    print str(datetime.datetime.now()) + ': starting initialization job ...'
+    runner.run()
 # move the result to input folder
-print 'moving results for next initialization ...'
+print str(datetime.datetime.now()) + ': moving results for next initialization ...'
 call(['hdfs', 'dfs', '-mv', '/user/leiyang/wiki_out', '/user/leiyang/wiki_in'])
-    
+
 
 # run BFS iteratively
 i = 1
-while(1):            
+while(1):
     stop = False
-    with iter_job.make_runner() as runner: 
-        print 'running iteration %d ...' %i
+    with iter_job.make_runner() as runner:
+        print str(datetime.datetime.now()) + ': running iteration %d ...' %i
         runner.run()
     # check if destination is reached
-    print 'checking if destination is reached ...'
+    print str(datetime.datetime.now()) + ': checking if destination is reached ...'
     with stop_job.make_runner() as runner:
         runner.run()
         for line in runner.stream_output():
@@ -65,18 +65,18 @@ while(1):
                 stop = True
                 result = '\nshortest path: %s' %(' -> '.join(path+[destination]))
                 break
-    
+
     if stop:
         break
     # more iteration needed
-    i += 1    
-    print 'moving results for next initialization ...'
+    i += 1
+    print str(datetime.datetime.now()) + ': moving results for next initialization ...'
     call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/wiki_in'])
     call(['hdfs', 'dfs', '-mv', '/user/leiyang/wiki_out', '/user/leiyang/wiki_in'])
 
 # clear results
-print 'Destination reached, clearing files ...'
+print str(datetime.datetime.now()) + ': destination reached, clearing files ...'
 call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/wiki*'])
-    
-print "Traversing completes!"
+
+print str(datetime.datetime.now()) + ": traversing completes!"
 print result
