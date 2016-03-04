@@ -14,6 +14,9 @@ class ShortestPathIter(MRJob):
         self.add_passthrough_option(
             '--source', dest='source', default='1', type='string',
             help='source: source node (default 1)')
+        self.add_passthrough_option(
+            '--destination', dest='destination', default='1', type='string',
+            help='destination: destination node (default 1)')
 
     def mapper(self, _, line):
         nid, dic = line.strip().split('\t', 1)
@@ -30,7 +33,7 @@ class ShortestPathIter(MRJob):
             for m in node['adj']:
                 yield m, {'dd':node['adj'][m] + node['dist'], 'pp':node['path']+[nid]}
 
-    def reducer(self, nid, value):
+    def reducer(self, nid, value):        
         dmin = float('inf')
         path = node = None
         # loop through all arrivals
@@ -57,14 +60,13 @@ class ShortestPathIter(MRJob):
 
     def steps(self):
         jc = {
-            'mapreduce.job.maps': '10',
-            'mapreduce.job.reduces': '10',
+            'mapreduce.job.maps': '2',
+            'mapreduce.job.reduces': '2',
         }
         return [MRStep(mapper=self.mapper
                        , combiner=self.reducer
                        , reducer=self.reducer
-                       #, reducer_final=self.reducer_final
-                       #, jobconf = jc
+                       , jobconf = jc
                       )
                ]
 
