@@ -1,6 +1,8 @@
 #!/usr/bin/python
 from ShortestPathIter import ShortestPathIter
 from getPath import getPath
+from isTraverseCompleted import isTraverseCompleted
+from isDestinationReached import isDestinationReached
 from subprocess import call
 import sys, getopt, datetime
 
@@ -8,16 +10,16 @@ import sys, getopt, datetime
 if __name__ == "__main__":
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hg:s:d:m:")
+        opts, args = getopt.getopt(sys.argv[1:], "hg:s:d:m:w:")
     except getopt.GetoptError:
-        print 'RunUnweightedBFS.py -g <graph> -s <source> -d <destination> -m <mode>'
+        print 'RunBFS.py -g <graph> -s <source> -d <destination> -m <mode> -w <weighted>'
         sys.exit(2)
-    if len(opts) != 4:
-        print 'RunUnweightedBFS.py -g <graph> -s <source> -d <destination> -m <mode>'
+    if len(opts) != 5:
+        print 'RunBFS.py -g <graph> -s <source> -d <destination> -m <mode> -w <weighted>'
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
-            print 'RunUnweightedBFS.py -g <graph> -s <source> -d <destination> -m <mode>'
+            print 'RunBFS.py -g <graph> -s <source> -d <destination> -m <mode> -w <weighted>'
             sys.exit(2)
         elif opt == '-g':
             graph = arg
@@ -27,50 +29,75 @@ if __name__ == "__main__":
             destination = arg
         elif opt == '-m':
             mode = arg
+        elif opt == '-w':
+            weighted = arg
 
+isWeighted = weighted=='1'
+print str(datetime.datetime.now()) + ': execution started, BFS between node %s and node %s on %s graph %s ...' %(
+    source, destination, 'weighted' if isWeighted else 'unweighted', graph)
 
 # creat BFS job
-init_job = ShortestPathIter(args=[graph, '--source', source, '--destination', destination,
-                                            '-r', mode, '--output-dir', 'hdfs:///user/leiyang/out'])
+init_job = ShortestPathIter(args=[graph, '--source', source, '--destination', destination, '--weighted', weighted,
+                                  '-r', mode, '--output-dir', 'hdfs:///user/leiyang/out'])
 
-iter_job = ShortestPathIter(args=['hdfs:///user/leiyang/in/part*', '--source', source, '--destination',
-                                            destination, '-r', mode, '--output-dir', 'hdfs:///user/leiyang/out'])
+iter_job = ShortestPathIter(args=['hdfs:///user/leiyang/in/part*', '--source', source, '--destination', destination,
+                                  '--weighted', weighted, '-r', mode, '--output-dir', 'hdfs:///user/leiyang/out'])
 
 path_job = getPath(args=['hdfs:///user/leiyang/out/part*', '--destination', destination, '-r', mode])
+
+if isWeighted:
+    stop_job = isTraverseCompleted(args=['hdfs:///user/leiyang/out/part*', 'hdfs:///user/leiyang/in/part*', '-r', mode])
+else:
+    stop_job = isDestinationReached(args=['hdfs:///user/leiyang/out/part*', '--destination', destination, '-r', mode])
 
 # run initialization job
 with init_job.make_runner() as runner:
     print str(datetime.datetime.now()) + ': starting initialization job ...'
     runner.run()
-    print runner.counters() #['weighted']['dist_changed']
 # move the result to input folder
-#print str(datetime.datetime.now()) + ': node number with distance change: ' + n_change
 print str(datetime.datetime.now()) + ': moving results for next initialization ...'
 call(['hdfs', 'dfs', '-mv', '/user/leiyang/out', '/user/leiyang/in'])
 
-
 # run BFS iteratively
 i = 1
-while(0):
-    stop = False
+while(1):    
     with iter_job.make_runner() as runner:
         print str(datetime.datetime.now()) + ': running iteration %d ...' %i
         runner.run()
-        # check if destination is reached: no counter is called
-        stop = 'unweighted' not in runner.counters()
-
-    # if destination reached, get path and break out
-    if stop:
-        print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'
+        
+    # check if traverse is completed: no node has changing distance
+    with stop_job.make_runner() as runner:
+        print str(datetime.datetime.now()) + ': checking stopping criterion ...'
+        runner.run()
+        output = []        
+        for line in runner.stream_output():
+            n, text = stop_job.parse_output_line(line)
+            output.append([n, text])
+            
+    # if traverse completed, get path and break out
+    flag = sum([x[0] for x in output])
+    if isWeighted and flag==0:
+        print str(datetime.datetime.now()) + ': traverse has completed, retrieving path ...'
         with path_job.make_runner() as runner:
             runner.run()
             for line in runner.stream_output():
-                text, path = stop_job.parse_output_line(line)
-                result = ': shortest path: %s' %(' -> '.join(path+[destination]))
+                text, path = path_job.parse_output_line(line)                
+                result = ': shortest path: %s' %(' -> '.join(path))                
+        break
+    elif (not isWeighted) and flag==1:
+        print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'        
+        for x,path in output:
+            if x==1:
+                result = ': shortest path: %s'%(' -> '.join(path))
+                break
         break
 
     # more iteration needed
     i += 1
+    if isWeighted:
+        print str(datetime.datetime.now()) + ': %d nodes changed distance' %flag
+    else:
+        print str(datetime.datetime.now()) + ': destination not reached yet.'
     print str(datetime.datetime.now()) + ': moving results for next initialization ...'
     call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/in'])
     call(['hdfs', 'dfs', '-mv', '/user/leiyang/out', '/user/leiyang/in'])
@@ -80,5 +107,5 @@ print str(datetime.datetime.now()) + ': clearing files ...'
 call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/in'])
 call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/out'])
 
-print str(datetime.datetime.now()) + ": traversing completes!"
+print str(datetime.datetime.now()) + ": traversing completes!\n"
 print str(datetime.datetime.now()) + result

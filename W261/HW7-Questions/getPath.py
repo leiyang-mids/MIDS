@@ -18,8 +18,7 @@ class getPath(MRJob):
         self.path = None
 
     def mapper(self, _, line):
-        nid, dic = line.strip().split('\t', 1)
-        #nid = nid.strip('"')
+        nid, dic = line.strip().split('\t', 1)        
         # emit distances to reachable nodes
         if nid.strip('"') == self.options.destination:
             cmd = 'node = %s' %dic
@@ -28,11 +27,11 @@ class getPath(MRJob):
 
     def mapper_final(self):
         if self.path:
-            yield "shortest path", self.path
+            yield "shortest path - ", self.path+[self.options.destination]
 
     def steps(self):
         jc = {
-            'mapreduce.job.maps': '1',
+            'mapreduce.job.maps': '2',
         }
         return [MRStep(mapper_init=self.mapper_init
                        , mapper=self.mapper

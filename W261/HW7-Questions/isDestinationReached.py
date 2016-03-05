@@ -9,10 +9,7 @@ class isDestinationReached(MRJob):
         super(isDestinationReached, self).__init__(*args, **kwargs)
 
     def configure_options(self):
-        super(isDestinationReached, self).configure_options()
-        self.add_passthrough_option(
-            '--source', dest='source', default='1', type='string',
-            help='source: source node (default 1)')
+        super(isDestinationReached, self).configure_options()        
         self.add_passthrough_option(
             '--destination', dest='destination', default='1', type='string',
             help='destination: destination node (default 1)')
@@ -21,21 +18,20 @@ class isDestinationReached(MRJob):
         self.path = None
 
     def mapper(self, _, line):
-        nid, dic = line.strip().split('\t', 1)
-        #nid = nid.strip('"')
+        nid, dic = line.strip().split('\t', 1)        
         # emit distances to reachable nodes
         if nid.strip('"') == self.options.destination:
             cmd = 'node = %s' %dic
             exec cmd
-            self.path = node['path']            
+            if node['dist'] > 0:
+                self.path = node['path']+[self.options.destination]         
 
-    def mapper_final(self):
-        if self.path:
-            yield "shortest path", self.path
+    def mapper_final(self):       
+        yield 1 if self.path else 0, self.path
 
     def steps(self):
         jc = {
-            'mapreduce.job.maps': '16',
+            'mapreduce.job.maps': '2',
         }
         return [MRStep(mapper_init=self.mapper_init
                        , mapper=self.mapper
