@@ -4,7 +4,8 @@ from getPath import getPath
 from isTraverseCompleted import isTraverseCompleted
 from isDestinationReached import isDestinationReached
 from subprocess import call
-import sys, getopt, datetime
+from time import time
+import sys, getopt, datetime, os
 
 # parse parameter
 if __name__ == "__main__":
@@ -32,9 +33,12 @@ if __name__ == "__main__":
         elif opt == '-w':
             weighted = arg
 
+start = time()
+FNULL = open(os.devnull, 'w')
+
 isWeighted = weighted=='1'
-print str(datetime.datetime.now()) + ': execution started, BFS between node %s and node %s on %s graph %s ...' %(
-    source, destination, 'weighted' if isWeighted else 'unweighted', graph)
+print str(datetime.datetime.now()) + ': BFS started between node %s and node %s on %s graph %s ...' %(
+    source, destination, 'weighted' if isWeighted else 'unweighted', graph[graph.rfind('/')+1:])
 
 # creat BFS job
 init_job = ShortestPathIter(args=[graph, '--source', source, '--destination', destination, '--weighted', weighted,
@@ -55,7 +59,7 @@ with init_job.make_runner() as runner:
     print str(datetime.datetime.now()) + ': starting initialization job ...'
     runner.run()
 # move the result to input folder
-print str(datetime.datetime.now()) + ': moving results for next initialization ...'
+print str(datetime.datetime.now()) + ': moving results for next iteration ...'
 call(['hdfs', 'dfs', '-mv', '/user/leiyang/out', '/user/leiyang/in'])
 
 # run BFS iteratively
@@ -98,14 +102,14 @@ while(1):
         print str(datetime.datetime.now()) + ': %d nodes changed distance' %flag
     else:
         print str(datetime.datetime.now()) + ': destination not reached yet.'
-    print str(datetime.datetime.now()) + ': moving results for next initialization ...'
-    call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/in'])
+    print str(datetime.datetime.now()) + ': moving results for next iteration ...'
+    call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/in'], stdout=FNULL)
     call(['hdfs', 'dfs', '-mv', '/user/leiyang/out', '/user/leiyang/in'])
 
 # clear results
 print str(datetime.datetime.now()) + ': clearing files ...'
-call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/in'])
-call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/out'])
+call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/in'], stdout=FNULL)
+call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/out'], stdout=FNULL)
 
-print str(datetime.datetime.now()) + ": traversing completes!\n"
-print str(datetime.datetime.now()) + result
+print str(datetime.datetime.now()) + ": traversing completes in .%1f minutes!\n" %((time()-start)/60.0)
+print str(datetime.datetime.now()) + result + '\n'
