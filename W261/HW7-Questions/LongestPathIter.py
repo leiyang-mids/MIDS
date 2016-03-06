@@ -14,8 +14,8 @@ class LongestPathIter(MRJob):
             '--source', dest='source', default='1', type='string',
             help='source: source node (default 1)')        
         self.add_passthrough_option(
-            '--weighted', dest='weighted', default='1', type='string',
-            help='weighted: is weighted graph (default 1)')
+            '--weighted', dest='weighted', default='n', type='string',
+            help='weighted: is weighted graph (default n)')
     
 
     def mapper_weighted(self, _, line):
@@ -48,7 +48,8 @@ class LongestPathIter(MRJob):
         # emit distances to reachable nodes
         if node['dist'] >= 0:
             for m in node['adj']:
-                yield m, {'dd':(1+node['dist']), 'pp':(node['path']+[nid])}
+                if m not in node['path']:
+                    yield m, {'dd':(1+node['dist']), 'pp':(node['path']+[nid])}
                 
     # write a separate combiner ensure the integrity of the graph topology
     # no additional node object will be generated
@@ -58,14 +59,15 @@ class LongestPathIter(MRJob):
         # loop through all arrivals
         for v in value:            
             if 'dist' in v:
-                yield nid, v           
+                yield nid, v                      
             elif v['dd'] > dmax:
                 dmax, path = v['dd'], v['pp']       
-        # emit the smallest distance for nid        
-        yield nid, {'dd':dmax, 'pp':path}
+        # emit the smallest distance for nid       
+        if path:
+            yield nid, {'dd':dmax, 'pp':path}
     
     def reducer(self, nid, value):              
-        dmax = 0
+        dmax = -2
         path = node = None
         # loop through all arrivals
         for v in value:            
@@ -91,7 +93,7 @@ class LongestPathIter(MRJob):
             'mapreduce.job.maps': '2',
             'mapreduce.job.reduces': '2',
         }
-        return [MRStep(mapper=self.mapper_weighted if self.options.weighted == '1' else self.mapper_unweighted
+        return [MRStep(mapper=self.mapper_weighted if self.options.weighted == 'y' else self.mapper_unweighted
                        , combiner=self.combiner
                        , reducer=self.reducer
                        , jobconf = jc

@@ -27,8 +27,8 @@ class isTraverseCompleted(MRJob):
 
     def steps(self):
         jc = {
-            'mapreduce.job.maps': '20',
-            'mapreduce.job.reduces': '20',
+            'mapreduce.job.maps': '2',
+            'mapreduce.job.reduces': '2',
         }
         return [MRStep(mapper=self.mapper
                        , reducer_init=self.reducer_init

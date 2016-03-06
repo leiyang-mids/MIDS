@@ -2,6 +2,8 @@
 from ShortestPathIter import ShortestPathIter
 from isTraverseCompleted import isTraverseCompleted
 from isDestinationReached import isDestinationReached
+from LongestPathIter import LongestPathIter
+from getLongestDistance import getLongestDistance
 from getPath import getPath
 from subprocess import call, check_output
 from time import time
@@ -11,11 +13,11 @@ import sys, getopt, datetime, os
 if __name__ == "__main__":
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hg:s:d:m:w:i:")
+        opts, args = getopt.getopt(sys.argv[1:], "hg:s:d:m:w:i:l:")
     except getopt.GetoptError:
         print 'RunBFS.py -g <graph> -s <source> -d <destination> -m <mode> -w <weighted>'
         sys.exit(2)
-    if len(opts) != 6:
+    if len(opts) != 7:
         print 'RunBFS.py -g <graph> -s <source> -d <destination> -m <mode> -w <weighted>'
         sys.exit(2)
     for opt, arg in opts:
@@ -34,24 +36,42 @@ if __name__ == "__main__":
             weighted = arg
         elif opt == '-i':
             index = arg
+        elif opt == '-l':
+            longest = arg
 
 start = time()
 FNULL = open(os.devnull, 'w')
 
-isWeighted = weighted=='1'
-print str(datetime.datetime.now()) + ': BFS started between node %s and node %s on %s graph %s ...' %(
-    source, destination, 'weighted' if isWeighted else 'unweighted', graph[graph.rfind('/')+1:])
+isWeighted = weighted=='y'
+isLongest = longest=='y'
+
+if isLongest:
+    print str(datetime.datetime.now()) + ': Longest distance BFS started at node %s on %s graph %s ...' %(
+        source, 'weighted' if isWeighted else 'unweighted', graph[graph.rfind('/')+1:])
+else:
+    print str(datetime.datetime.now()) + ': Shortest path BFS started between node %s and node %s on %s graph %s ...' %(
+        source, destination, 'weighted' if isWeighted else 'unweighted', graph[graph.rfind('/')+1:])
 
 # creat BFS job
-init_job = ShortestPathIter(args=[graph, '--source', source, '--destination', destination, '--weighted', weighted,
+if not isLongest:
+    init_job = ShortestPathIter(args=[graph, '--source', source, '--destination', destination, '--weighted', weighted,
                                   '-r', mode, '--output-dir', 'hdfs:///user/leiyang/out'])
 
-iter_job = ShortestPathIter(args=['hdfs:///user/leiyang/in/part*', '--source', source, '--destination', destination,
+    iter_job = ShortestPathIter(args=['hdfs:///user/leiyang/in/part*', '--source', source, '--destination', destination,
                                   '--weighted', weighted, '-r', mode, '--output-dir', 'hdfs:///user/leiyang/out'])
+else:
+    init_job = LongestPathIter(args=[graph, '--source', source, '--weighted', weighted,
+                                  '-r', mode, '--output-dir', 'hdfs:///user/leiyang/out'])
 
-path_job = getPath(args=['hdfs:///user/leiyang/out/part*', '--destination', destination, '-r', mode])
+    iter_job = LongestPathIter(args=['hdfs:///user/leiyang/in/part*', '--source', source, 
+                                  '--weighted', weighted, '-r', mode, '--output-dir', 'hdfs:///user/leiyang/out'])
+    
+if isLongest:
+    path_job = getLongestDistance(args=['hdfs:///user/leiyang/out/part*', '-r', mode])
+else:        
+    path_job = getPath(args=['hdfs:///user/leiyang/out/part*', '--destination', destination, '-r', mode])
 
-if isWeighted:
+if isWeighted or isLongest:
     stop_job = isTraverseCompleted(args=['hdfs:///user/leiyang/out/part*', 'hdfs:///user/leiyang/in/part*', '-r', mode])
 else:
     stop_job = isDestinationReached(args=['hdfs:///user/leiyang/out/part*', '--destination', destination, '-r', mode])
@@ -66,39 +86,40 @@ call(['hdfs', 'dfs', '-mv', '/user/leiyang/out', '/user/leiyang/in'])
 
 # run BFS iteratively
 i, path = 1, None
-while(1):
+while(1):    
     with iter_job.make_runner() as runner:
         print str(datetime.datetime.now()) + ': running iteration %d ...' %i
         runner.run()
-
+        
     # check if traverse is completed: no node has changing distance
     with stop_job.make_runner() as runner:
         print str(datetime.datetime.now()) + ': checking stopping criterion ...'
         runner.run()
-        output = []
+        output = []        
         for line in runner.stream_output():
             n, text = stop_job.parse_output_line(line)
             output.append([n, text])
-
+            
     # if traverse completed, get path and break out
-    flag = sum([x[0] for x in output])
-    if isWeighted and flag==0:
-        print str(datetime.datetime.now()) + ': traverse has completed, retrieving path ...'
+    flag = sum([x[0] for x in output])    
+    print 'output value: %s' %str(output)
+    if (isWeighted or isLongest) and flag==0:
+        print str(datetime.datetime.now()) + ': traverse has completed, retrieving path ...'        
         with path_job.make_runner() as runner:
             runner.run()
             for line in runner.stream_output():
-                text, path = path_job.parse_output_line(line)
+                text, path = path_job.parse_output_line(line)                                
         break
     elif (not isWeighted) and flag==1:
-        print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'
+        print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'                
         for x,path in output:
-            if x==1:
+            if x==1:                    
                 break
         break
-
+    
     # if more iteration needed
     i += 1
-    if isWeighted:
+    if isWeighted or isLongest:
         print str(datetime.datetime.now()) + ': %d nodes changed distance' %flag
     else:
         print str(datetime.datetime.now()) + ': destination not reached yet.'
