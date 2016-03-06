@@ -66,36 +66,36 @@ call(['hdfs', 'dfs', '-mv', '/user/leiyang/out', '/user/leiyang/in'])
 
 # run BFS iteratively
 i, path = 1, None
-while(1):    
+while(1):
     with iter_job.make_runner() as runner:
         print str(datetime.datetime.now()) + ': running iteration %d ...' %i
         runner.run()
-        
+
     # check if traverse is completed: no node has changing distance
     with stop_job.make_runner() as runner:
         print str(datetime.datetime.now()) + ': checking stopping criterion ...'
         runner.run()
-        output = []        
+        output = []
         for line in runner.stream_output():
             n, text = stop_job.parse_output_line(line)
             output.append([n, text])
-            
+
     # if traverse completed, get path and break out
-    flag = sum([x[0] for x in output])    
+    flag = sum([x[0] for x in output])
     if isWeighted and flag==0:
-        print str(datetime.datetime.now()) + ': traverse has completed, retrieving path ...'        
+        print str(datetime.datetime.now()) + ': traverse has completed, retrieving path ...'
         with path_job.make_runner() as runner:
             runner.run()
             for line in runner.stream_output():
-                text, path = path_job.parse_output_line(line)                                
+                text, path = path_job.parse_output_line(line)
         break
     elif (not isWeighted) and flag==1:
-        print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'                
+        print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'
         for x,path in output:
-            if x==1:                    
+            if x==1:
                 break
         break
-    
+
     # if more iteration needed
     i += 1
     if isWeighted:
