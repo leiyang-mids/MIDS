@@ -1,9 +1,9 @@
 #!/usr/bin/python
 from ShortestPathIter import ShortestPathIter
-from getPath import getPath
 from isTraverseCompleted import isTraverseCompleted
 from isDestinationReached import isDestinationReached
-from subprocess import call
+from getPath import getPath
+from subprocess import call, check_output
 from time import time
 import sys, getopt, datetime, os
 
@@ -11,11 +11,11 @@ import sys, getopt, datetime, os
 if __name__ == "__main__":
 
     try:
-        opts, args = getopt.getopt(sys.argv[1:], "hg:s:d:m:w:")
+        opts, args = getopt.getopt(sys.argv[1:], "hg:s:d:m:w:i:")
     except getopt.GetoptError:
         print 'RunBFS.py -g <graph> -s <source> -d <destination> -m <mode> -w <weighted>'
         sys.exit(2)
-    if len(opts) != 5:
+    if len(opts) != 6:
         print 'RunBFS.py -g <graph> -s <source> -d <destination> -m <mode> -w <weighted>'
         sys.exit(2)
     for opt, arg in opts:
@@ -32,6 +32,8 @@ if __name__ == "__main__":
             mode = arg
         elif opt == '-w':
             weighted = arg
+        elif opt == '-i':
+            index = arg
 
 start = time()
 FNULL = open(os.devnull, 'w')
@@ -63,7 +65,7 @@ print str(datetime.datetime.now()) + ': moving results for next iteration ...'
 call(['hdfs', 'dfs', '-mv', '/user/leiyang/out', '/user/leiyang/in'])
 
 # run BFS iteratively
-i = 1
+i, path = 1, None
 while(1):    
     with iter_job.make_runner() as runner:
         print str(datetime.datetime.now()) + ': running iteration %d ...' %i
@@ -79,24 +81,22 @@ while(1):
             output.append([n, text])
             
     # if traverse completed, get path and break out
-    flag = sum([x[0] for x in output])
+    flag = sum([x[0] for x in output])    
     if isWeighted and flag==0:
-        print str(datetime.datetime.now()) + ': traverse has completed, retrieving path ...'
+        print str(datetime.datetime.now()) + ': traverse has completed, retrieving path ...'        
         with path_job.make_runner() as runner:
             runner.run()
             for line in runner.stream_output():
-                text, path = path_job.parse_output_line(line)                
-                result = ': shortest path: %s' %(' -> '.join(path))                
+                text, path = path_job.parse_output_line(line)                                
         break
     elif (not isWeighted) and flag==1:
-        print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'        
+        print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'                
         for x,path in output:
-            if x==1:
-                result = ': shortest path: %s'%(' -> '.join(path))
+            if x==1:                    
                 break
         break
-
-    # more iteration needed
+    
+    # if more iteration needed
     i += 1
     if isWeighted:
         print str(datetime.datetime.now()) + ': %d nodes changed distance' %flag
@@ -111,5 +111,9 @@ print str(datetime.datetime.now()) + ': clearing files ...'
 call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/in'], stdout=FNULL)
 call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/out'], stdout=FNULL)
 
-print str(datetime.datetime.now()) + ": traversing completes in .%1f minutes!\n" %((time()-start)/60.0)
-print str(datetime.datetime.now()) + result + '\n'
+# translate into words if index is valid
+if os.path.isfile(index):
+    path = [check_output(['grep', x, index]).split('\t')[0] for x in path]
+
+print str(datetime.datetime.now()) + ": traversing completes in %.1f minutes!\n" %((time()-start)/60.0)
+print str(datetime.datetime.now()) + ': shortest path: %s\n'%(' -> '.join(path))
