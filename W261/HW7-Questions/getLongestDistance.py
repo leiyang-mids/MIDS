@@ -16,7 +16,7 @@ class getLongestDistance(MRJob):
         nid, dic = line.strip().split('\t', 1)        
         cmd = 'node = %s' %dic
         exec cmd
-        if len(node['path']) > len(self.longest):
+        if len(node['path']) >= len(self.longest):
             self.longest = node['path']+[nid.strip('"')]  
 
     def mapper_final(self):        
@@ -24,7 +24,7 @@ class getLongestDistance(MRJob):
 
     def steps(self):
         jc = {
-            'mapreduce.job.maps': '2',
+            'mapreduce.job.maps': '1',
         }
         return [MRStep(mapper_init=self.mapper_init
                        , mapper=self.mapper

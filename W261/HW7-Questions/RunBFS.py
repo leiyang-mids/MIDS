@@ -85,7 +85,7 @@ print str(datetime.datetime.now()) + ': moving results for next iteration ...'
 call(['hdfs', 'dfs', '-mv', '/user/leiyang/out', '/user/leiyang/in'])
 
 # run BFS iteratively
-i, path = 1, None
+i, path = 1, []
 while(1):    
     with iter_job.make_runner() as runner:
         print str(datetime.datetime.now()) + ': running iteration %d ...' %i
@@ -102,15 +102,18 @@ while(1):
             
     # if traverse completed, get path and break out
     flag = sum([x[0] for x in output])    
-    print 'output value: %s' %str(output)
+    #print 'output value: %s' %str(output)
     if (isWeighted or isLongest) and flag==0:
         print str(datetime.datetime.now()) + ': traverse has completed, retrieving path ...'        
         with path_job.make_runner() as runner:
             runner.run()
             for line in runner.stream_output():
-                text, path = path_job.parse_output_line(line)                                
+                text, ppp = path_job.parse_output_line(line)   
+                if len(ppp) > len(path):
+                    path = ppp
+                #print 'path out of job: %s' %str(path)
         break
-    elif (not isWeighted) and flag==1:
+    elif (not isWeighted) and flag==1 and (not isLongest):
         print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'                
         for x,path in output:
             if x==1:                    
@@ -130,11 +133,13 @@ while(1):
 # clear results
 print str(datetime.datetime.now()) + ': clearing files ...'
 call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/in'], stdout=FNULL)
-call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/out'], stdout=FNULL)
+#call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/out'], stdout=FNULL)
 
 # translate into words if index is valid
+#print 'path array: %s' %str(path)
 if os.path.isfile(index):
+    #print 'index file: %s' %index
     path = [check_output(['grep', x, index]).split('\t')[0] for x in path]
 
 print str(datetime.datetime.now()) + ": traversing completes in %.1f minutes!\n" %((time()-start)/60.0)
-print str(datetime.datetime.now()) + ': shortest path: %s\n'%(' -> '.join(path))
+print str(datetime.datetime.now()) + ': %s path: %s\n'%('longest' if isLongest else 'shortest', ' -> '.join(path))

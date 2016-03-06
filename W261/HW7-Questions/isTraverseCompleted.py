@@ -9,26 +9,26 @@ class isTraverseCompleted(MRJob):
         super(isTraverseCompleted, self).__init__(*args, **kwargs)
 
     def mapper(self, _, line):
-        nid, dic = line.strip().split('\t', 1)
+        nid, dic = line.strip().split('\t', 1)        
         # emit node ID and distance
         cmd = 'node = %s' %dic
         exec cmd
-        yield nid, node['dist']
+        yield nid, node['dist']         
 
     def reducer_init(self):
         self.dist_changed = 0
-
+        
     def reducer(self, nid, dist):
         pair = [d for d in dist]
         self.dist_changed += pair[0]!=pair[1]
-
+        
     def reducer_final(self):
         yield self.dist_changed, 'traverse done' if self.dist_changed==0 else 'keep working'
 
     def steps(self):
         jc = {
-            'mapreduce.job.maps': '2',
-            'mapreduce.job.reduces': '2',
+            'mapreduce.job.maps': '1',
+            'mapreduce.job.reduces': '1',
         }
         return [MRStep(mapper=self.mapper
                        , reducer_init=self.reducer_init
