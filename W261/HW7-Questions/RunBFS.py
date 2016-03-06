@@ -110,8 +110,7 @@ while(1):
             for line in runner.stream_output():
                 text, ppp = path_job.parse_output_line(line)   
                 if len(ppp) > len(path):
-                    path = ppp
-                #print 'path out of job: %s' %str(path)
+                    path = ppp                
         break
     elif (not isWeighted) and flag==1 and (not isLongest):
         print str(datetime.datetime.now()) + ': destination is reached, retrieving path ...'                
@@ -133,12 +132,10 @@ while(1):
 # clear results
 print str(datetime.datetime.now()) + ': clearing files ...'
 call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/in'], stdout=FNULL)
-#call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/out'], stdout=FNULL)
+call(['hdfs', 'dfs', '-rm', '-r', '/user/leiyang/out'], stdout=FNULL)
 
 # translate into words if index is valid
-#print 'path array: %s' %str(path)
-if os.path.isfile(index):
-    #print 'index file: %s' %index
+if os.path.isfile(index):    
     path = [check_output(['grep', x, index]).split('\t')[0] for x in path]
 
 print str(datetime.datetime.now()) + ": traversing completes in %.1f minutes!\n" %((time()-start)/60.0)
