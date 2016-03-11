@@ -1,5 +1,5 @@
 1. install mrjob: sudo pip install mrjob
-2. isntall emacs: sudo yum install emacs
+2. install emacs: sudo yum install emacs
 3. set mrjob.conf: emacs ~/.mrjob.conf
 3.1 change replication number to 1 for HDFS in hdfs-site.xml
 4. add script
@@ -50,9 +50,24 @@ ssh -i w205.pem -N -L 8890:ec2-54-152-233-112.compute-1.amazonaws.com:8890 hadoo
 
 =================== open channel ========================
 
-/etc/hadoop/conf.empty/mapred-site.xml
+=================== start job history server ========================
+NOTE: job history server is already started with EMR, just log on is ok, no need to manually start
 
+sudo find / -name "mr-jobhistory-daemon.sh" --> /usr/lib/hadoop-mapreduce/sbin/mr-jobhistory-daemon.sh
+sudo find / -name "mapred-site.xml" -->
+/etc/hadoop/conf.empty/mapred-site.xml
+/var/aws/emr/bigtop-deploy/puppet/modules/hadoop/templates/mapred-site.xml
+/var/aws/emr/bigtop-deploy/puppet/modules/ignite_hadoop/templates/mapred-site.xml
+
+/usr/lib/hadoop-mapreduce/sbin/mr-jobhistory-daemon.sh --config /etc/hadoop/conf.empty/ start historyserver
+
+
+NOTE: local real one - /usr/local/Cellar/hadoop/2.7.1/libexec/sbin/mr-jobhistory-daemon.sh
+
+/etc/hadoop/conf.empty/mapred-site.xml
+     /usr/local/Cellar/hadoop/2*/sbin/mr-jobhistory-daemon.sh --config /usr/local/Cellar/hadoop/2*/libexec/etc/hadoop/ start historyserver
 sudo /usr/lib/hadoop-mapreduce/sbin/mr-jobhistory-daemon.sh --config /etc/hadoop/conf.empty/ start historyserver
+=================== start job history server ========================
 
 ================== misc notes ==================
 
@@ -81,8 +96,9 @@ runners:
 ================== mrjob.conf content ==================
 
 ================== copy file ==================
-scp -i ~/w205.pem ShortestPathIter.py hadoop@ec2-52-91-234-11.compute-1.amazonaws.com:~/lei/
-scp -i ~/w205.pem RunBFS.py hadoop@ec2-52-91-234-11.compute-1.amazonaws.com:~/lei/
-scp -i ~/w205.pem isDestinationReached.py hadoop@ec2-52-91-234-11.compute-1.amazonaws.com:~/lei/
-scp -i ~/w205.pem isTraverseCompleted.py hadoop@ec2-52-91-234-11.compute-1.amazonaws.com:~/lei/
-scp -i ~/w205.pem getPath.py hadoop@ec2-52-91-234-11.compute-1.amazonaws.com:~/lei/
+scp -i ~/w205.pem ShortestPathIter.py hadoop@ec2-54-86-43-85.compute-1.amazonaws.com:~/lei/
+scp -i ~/w205.pem RunBFS.py hadoop@ec2-54-86-43-85.compute-1.amazonaws.com:~/lei/
+scp -i ~/w205.pem isDestinationReached.py hadoop@ec2-54-86-43-85.compute-1.amazonaws.com:~/lei/
+scp -i ~/w205.pem isTraverseCompleted.py hadoop@ec2-54-86-43-85.compute-1.amazonaws.com:~/lei/
+scp -i ~/w205.pem getPath.py hadoop@ec2-54-86-43-85.compute-1.amazonaws.com:~/lei/
+scp -i ~/w205.pem ./data/undirected_toy.txt hadoop@ec2-54-86-43-85.compute-1.amazonaws.com:~/lei/
