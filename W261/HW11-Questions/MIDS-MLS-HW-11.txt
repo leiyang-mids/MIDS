@@ -1,0 +1,146 @@
+===========================================================================
+===MIDS UC Berkeley, Machine Learning at Scale DATSCI W261 ASSIGNMENT #11===
+-----------------------
+V1.3 Final 03/28/2016  HW11
+-----------------------
+SPECIAL INSTRUCTIONS: 
+
+=== IMPORTANT ===
+Submit HW11 using Zeppelin notebooks (and NOT Jupyter notebooks).
+Submit HW11 using Zeppelin notebooks.
+Submit HW11 using Zeppelin notebooks.
+
+ This weeks homework is a group exercise. Your team assignments for completing this HW are located at:
+
+https://docs.google.com/spreadsheets/d/1ncFQl5Tovn-16slD8mYjP_nzMTPSfiGeLLzW8v_sMjg/edit?usp=sharing
+
+See column Team assignment for Homeworks in tab "Teams for HW Assignments"
+
+Please submit your homeworks (one per team) going forward via this form (and not thru the ISVC):
+
+https://docs.google.com/forms/d/1ZOr9RnIe_A06AcZDB6K1mJN4vrLeSmS2PD6Xm3eOiis/viewform?usp=send_form
+
+HW11 can be completed locally on your computer
+
+----------------------------------------------------------------------------------------------------
+
+HW11.0  Broadcast versus Caching in Spark
+What is the difference between broadcasting and caching data in Spark? Give an example (in the context of machine learning) of each mechanism (at a highlevel). Feel free to cut and paste code examples from the lectures to support your answer.
+
+Review the following Spark-notebook-based implementation of KMeans and use the broadcast pattern to make this implementation more efficient. Please describe your changes in English first, implement, comment your code and highlight your changes:
+
+Notebook
+https://www.dropbox.com/s/41q9lgyqhy8ed5g/EM-Kmeans.ipynb?dl=0
+
+Notebook via NBViewer
+http://nbviewer.ipython.org/urls/dl.dropbox.com/s/41q9lgyqhy8ed5g/EM-Kmeans.ipynb
+
+
+HW11.1  Loss Functions
+
+In the context of binary classification problems, does the linear SVM learning algorithm yield the same result as a L2 penalized logistic regesssion learning algorithm? 
+
+In your reponse, please discuss the loss functions, and the learnt models, and separating surfaces between the two classes.
+
+
+In the context of binary classification problems, does the linear SVM learning algorithm yield the same result as a perceptron learning algorithm? 
+
+[OPTIONAL]: generate an artifical binary classification dataset with 2 input features and plot the learnt separating surface for both a linear SVM and for  logistic regression. Comment on the learnt surfaces. Please feel free to do this in Python (no need to use Spark).
+
+
+
+HW11.2 Gradient descent
+In the context of logistic regression describe and define three flavors of penalized loss functions.  Are these all supported in Spark MLLib (include online references to support your answers)?
+
+Descibe probabilitic interpretations of the L1 and L2 priors for penalized logistic regression (HINT: see synchronous slides for week 11 for details)
+
+HW11.3  Logistic Regression
+
+Generate 2 sets of linearly separable data with 100 data points each using the data generation code provided below and plot each in separate plots. Call one the training set and the other the testing set.
+
+def generateData(n):
+ """ 
+  generates a 2D linearly separable dataset with n samples. 
+  The third element of the sample is the label
+ """
+ xb = (rand(n)*2-1)/2-0.5
+ yb = (rand(n)*2-1)/2+0.5
+ xr = (rand(n)*2-1)/2+0.5
+ yr = (rand(n)*2-1)/2-0.5
+ inputs = []
+ for i in range(len(xb)):
+  inputs.append([xb[i],yb[i],1])
+  inputs.append([xr[i],yr[i],-1])
+ return inputs
+
+Modify this data generation code to generating non-linearly separable training and testing datasets (with approximately 10% of the data falling on the wrong side of the separating hyperplane. Plot the resulting datasets. 
+
+NOTE: For the remainder of this problem please use the non-linearly separable training and testing datasets.
+
+Using MLLib  train up a LASSO logistic regression model with the training dataset and evaluate with the testing set. What a good number of iterations for training the logistic regression model? Justify with plots and words. 
+
+Derive and implement in Spark a weighted  LASSO logistic regression. Implement a convergence test of your choice to check for termination within your training algorithm . 
+
+Weight the above training dataset as follows:  Weight each example using the inverse vector length (Euclidean norm): 
+
+weight(X)= 1/||X||, 
+
+where ||X|| = SQRT(X.X)= SQRT(X1^2 + X2^2)
+
+Here X is vector made up of X1 and X2.
+
+Evaluate your homegrown weighted  LASSO logistic regression on the test dataset. Report misclassification error (1 - Accuracy) and how many iterations does it took to converge.
+
+Does Spark MLLib have a weighted LASSO logistic regression implementation. If so use it and report your findings on the weighted training set and test set. 
+
+HW11.4 SVMs
+
+Use the non-linearly separable training and testing datasets from HW11.3 in this problem.
+
+Using MLLib  train up a soft SVM model with the training dataset and evaluate with the testing set. What is a good number of iterations for training the SVM model? Justify with plots and words. 
+
+Derive and Implement in Spark a weighted soft linear svm classification learning algorithm.
+Evaluate your homegrown weighted soft linear svm classification learning algorithm on the weighted training dataset and test dataset from HW11.3. Report misclassification error (1 - Accuracy) and how many iterations does it took to converge?  How many support vectors do you end up?
+
+Does Spark MLLib have a weighted soft SVM learner. If so use it and report your findings on the weighted training set and test set. 
+
+
+
+11.5  [OPTIONAL] Distributed Perceptron algorithm.
+
+Using the following papers as background:
+http://static.googleusercontent.com/external_content/untrusted_dlcp/research.google.com/en//pubs/archive/36266.pdf
+
+https://www.dropbox.com/s/a5pdcp0r8ptudgj/gesmundo-tomeh-eacl-2012.pdf?dl=0
+
+http://www.slideshare.net/matsubaray/distributed-perceptron 
+
+Implement each of the following flavors of perceptron learning algorithm:
+
+1. Serial (All Data): This is the classifier returned if trained serially on all the available data.  On a single computer for example (Mistake driven)
+2. Serial (Sub Sampling): Shard the data, select one shard randomly and train serially. 
+3. Parallel (Parameter Mix): Learn a perceptron locally on each shard: 
+Once learning is complete combine each learnt percepton using a uniform weighting
+4. Parallel (Iterative Parameter Mix) as described in the above papers.
+
+11.6 [OPTIONAL: consider doing this in a group]  Evalution of perceptron algorihtms on PennTreeBank POS corpus
+Reproduce the experiments reported in the following paper:
+
+HadoopPerceptron: a Toolkit for Distributed Perceptron Training and
+Prediction with MapReduce
+Andrea Gesmundo and  Nadi Tomeh
+
+http://www.aclweb.org/anthology/E12-2020 
+
+These experiments focus on the prediction accuracy on a part-of-speech
+(POS) task using the PennTreeBank corpus. They use sections 0-18 of the Wall
+Street Journal for training, and sections 22-24 for testing.
+
+
+
+HW11.7 [[OPTIONAL: consider doing this in a group]  Kernal Adatron 
+
+Implement the Kernal Adatron in Spark (contact Jimi for details)
+
+==================END HW ==================
+============================================
