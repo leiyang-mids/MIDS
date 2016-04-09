@@ -12,7 +12,7 @@ DATA: See HW12.1 for details
 === IMPORTANT ===
 Submit HW11 using Zeppelin or Jupyter notebooks.
 
-This is an individual homework but can also be completed in your groups.  Your team assignments for 
+This is an individual homework but can also be completed in your groups.  Your team assignments for
 completing this HW are located at:
 
    https://docs.google.com/spreadsheets/d/1ncFQl5Tovn-16slD8mYjP_nzMTPSfiGeLLzW8v_sMjg/edit?usp=sharing
@@ -34,7 +34,7 @@ The Criteo CTR data is for HW12.1 is available here (24.3 Meg, 100,000 Rows):
 
      https://www.dropbox.com/s/m4jlnv6rdbqzzhu/dac_sample.txt?dl=0
 
-Alternatively you can download the sample data directly by following the instructions contained 
+Alternatively you can download the sample data directly by following the instructions contained
 in the HW description (8M compressed).
 
 The CTR Project description and starter notebook for Phase 1 of this project is available here:
@@ -42,17 +42,16 @@ The CTR Project description and starter notebook for Phase 1 of this project is 
        http://nbviewer.jupyter.org/urls/dl.dropbox.com/s/1wb2rdqbet54y1h/MIDS-MLS-Project-Criteo-CTR.ipynb
        https://www.dropbox.com/s/1wb2rdqbet54y1h/MIDS-MLS-Project-Criteo-CTR.ipynb?dl=0
 
-Please complete this notebook. 
+Please complete this notebook.
 
-NOTE I would like you to be in a position to discuss your findings for  phases 1 (i.e., HW12.1 in its entirity) 
+NOTE I would like you to be in a position to discuss your findings for  phases 1 (i.e., HW12.1 in its entirety)
 of this project during live session #13. Please be ready to use your notebook in class.
 
 
 =========
 HW12.2 OPTIONAL Homework  (please include your solution in your HW1 notebook)
-Implement a decision tree algorithm for regression for two input continous variables and one categorical input variable on a single core computer using Python. Use the IRIS dataset to evaluate your code, where the input variables are: Petal.Length Petal.Width  Species  and the target or output variable is  Sepal.Length. Use the same dataset to train and test your implementation. Stop expanding nodes once you have less than ten (10) examples (along with the usual stopping criteria). Report the mean squared error for your implementation and contrast that with the MSE from scikit-learn's implementation on this dataset (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html)
+Implement a decision tree algorithm for regression for two input continuous variables and one categorical input variable on a single core computer using Python. Use the IRIS dataset to evaluate your code, where the input variables are: Petal.Length Petal.Width  Species  and the target or output variable is  Sepal.Length. Use the same dataset to train and test your implementation. Stop expanding nodes once you have less than ten (10) examples (along with the usual stopping criteria). Report the mean squared error for your implementation and contrast that with the MSE from scikit-learn's implementation on this dataset (http://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeRegressor.html)
 
 
 ==================END HW ==================
 ============================================
-
