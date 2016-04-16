@@ -40,6 +40,7 @@ ctrl+a+c --> add new screen
 ctrl+a+d --> detach to screen
 screen -r --> reattach to screen
 ctrl+a+H --> terminate screen session
+screen -X -S [session # you want to kill] quit --> kill the screen session
 ================== screen notes ==================
 
 ================== mrjob.conf content ==================
