@@ -1,0 +1,347 @@
+MIDS Machine Learning at Scale End of Term exam, Week 15, Spring, 2016
+
+===Exam Schedule  (All times are in California Time)===
+
+ 4:00 PM - 6:00 PM 
+
+Exam location is at:
+
+    https://www.dropbox.com/s/k9mw3rnr86iktk6/MIDS-MLS-End-of-Term-2016-Spring-2016-04-27-Published.txt?dl=0
+===Instructions for exam ===
+
+Instructions:
+ 
+Within 2 hours of receiving my email can you  email me with two attachments:  
+-- ipython notebook that you use for calculations
+-- your end of term responses using  the following format. 
+
+ET1:a,c,
+ET2:d
+ET3:c
+..... 
+
+And complete exam submission form (http://goo.gl/forms/ggNYfRXz0t).
+
+Good luck,
+Jimi
+
+1: Please acknowledge receipt of exam by sending a quick reply to the instructors
+2: Review the submission form first to scope it out (it will take a 5-10 minutes to input your 
+   answers and other information into this form)
+3: Please keep all your work and responses in ONE (1) notebook only (and submit via the form)
+4: Please make sure that the NBViewer link for your Submission notebook works
+5: Please do NOT discuss this exam with anyone (including your class mates) until after 8AM (West coast time) Friday, April 29, 2016 
+6: This is a take home exam. Please complete by yourself without assistance from others.
+
+Please use your live session time from week 8 to complete this mid term 
+(plus an additional 30 minutes if you need it). 
+This is an open book exam meaning you can consult webpages and textbooks 
+(but not each other or other people). Please complete this exam by yourself.
+
+Please submit your solutions and notebook via the following form:
+
+      http://goo.gl/forms/ggNYfRXz0t
+
+
+=====Exam questions begins here=====
+
+===== ET:1  Using one-hot-encoding, a categorical feature with four distinct values would be represented by how many features?
+
+(a) 1 feature 
+(b) 2 features
+(c) 4 features
+(d) none of the above
+
+
+===== ET:2 In the following (and also referring to HW12: http://nbviewer.jupyter.org/urls/dl.dropbox.com/s/1wb2rdqbet54y1h/MIDS-MLS-Project-Criteo-CTR.ipynb) we have hashed the three sample points using numBuckets=4 and numBuckets=100. Complete the three statements below about these hashed features summarized in the following table using each answer once.
+
+Name	              Raw Features	                       4 Buckets	        100 Buckets
+sampleOne	[(0, 'mouse'), (1, 'black')]	            {2: 1.0, 3: 1.0}	{14: 1.0, 31: 1.0}
+sampleTwo	[(0, 'cat'), (1, 'tabby'), (2, 'mouse')]	{0: 2.0, 2: 1.0}	{40: 1.0, 16: 1.0, 62: 1.0}
+sampleThree	[(0, 'bear'), (1, 'black'), (2, 'salmon')	{0: 1.0, 1: 1.0, 2: 1.0}	{72: 1.0, 5: 1.0, 14: 1.0}
+
+With 100 buckets, sampleOne and sampleThree both contain index 14 due to __________.
+
+(a) A hash collision
+(b) Underlying properties of the data
+(c) The fact that used 100 buckets
+(d) none of the above
+
+
+===== ET:3 In the following (and also referring to HW12: http://nbviewer.jupyter.org/urls/dl.dropbox.com/s/1wb2rdqbet54y1h/MIDS-MLS-Project-Criteo-CTR.ipynb) we have hashed the three sample points using numBuckets=4 and numBuckets=100. Complete the three statements below about these hashed features summarized in the following table using each answer once.
+
+Name	              Raw Features	                       4 Buckets	        100 Buckets
+sampleOne	[(0, 'mouse'), (1, 'black')]	            {2: 1.0, 3: 1.0}	{14: 1.0, 31: 1.0}
+sampleTwo	[(0, 'cat'), (1, 'tabby'), (2, 'mouse')]	{0: 2.0, 2: 1.0}	{40: 1.0, 16: 1.0, 62: 1.0}
+sampleThree	[(0, 'bear'), (1, 'black'), (2, 'salmon')	{0: 1.0, 1: 1.0, 2: 1.0}	{72: 1.0, 5: 1.0, 14: 1.0}
+
+It is likely that sampleTwo has two indices with 4 buckets, but three indices with 100 buckets due to __________.
+
+(a) A hash collision
+(b) Underlying properties of the data
+(c) The fact that we go from 4 to 100 buckets
+(d) none of the above
+
+
+
+
+===== ET:4 In the following (and also referring to HW12: http://nbviewer.jupyter.org/urls/dl.dropbox.com/s/1wb2rdqbet54y1h/MIDS-MLS-Project-Criteo-CTR.ipynb) we have hashed the three sample points using numBuckets=4 and numBuckets=100. Complete the three statements below about these hashed features summarized in the following table using each answer once.
+
+Name	              Raw Features	                       4 Buckets	        100 Buckets
+sampleOne	[(0, 'mouse'), (1, 'black')]	            {2: 1.0, 3: 1.0}	{14: 1.0, 31: 1.0}
+sampleTwo	[(0, 'cat'), (1, 'tabby'), (2, 'mouse')]	{0: 2.0, 2: 1.0}	{40: 1.0, 16: 1.0, 62: 1.0}
+sampleThree	[(0, 'bear'), (1, 'black'), (2, 'salmon')	{0: 1.0, 1: 1.0, 2: 1.0}	{72: 1.0, 5: 1.0, 14: 1.0}
+
+It is likely that sampleTwo has two indices with 4 buckets, but three indices with 100 buckets due to __________.
+
+(a) A hash collision
+(b) Underlying properties of the data
+(c) The fact that we use 4 buckets
+(d) none of the above
+
+===== ET:5  When applying numerical machine learning approaches (and for non-numerical approaches if required) to big data problems which of the following steps are could be used during modeling and are recommended:
+
+(a) Convert categorical features to numerical features via one-hot-encoding and store in a dense representation
+(b) Transform  categorical features using hashing regardless of how many unique categorical values exist in training and test data
+(c) Use matrix factorization to remap your input vectors to latent concepts
+(d) none of the above
+
+===== ET:6 When dealing with numercial data which of the following are ways to deal with missing data:
+
+(a) Delete records that have missing input values
+(b) Standardize the data and set all missing values to 1 (one)
+(c) Use K-nearest neighbours based on the test set to fill in missing values in the training set 
+(d) none of the above
+
+
+
+===== ET:7 In the Criteo project, we're trying to predict what:
+
+(a) Revenue from click events
+(b) Click-through vs not click event
+(c) Probability of a click event
+(d) none of the above
+
+
+
+===== ET:8 Which of the following are true about the purpose of a loss function?
+
+(a) It’s a way to penalize a model for incorrect predictions 
+(b) It precisely defines the optimization problem to be solved for a particular learning model 
+(c) Loss functions can be used for modeling both classification and regression problems
+(d) none of the above
+
+
+===== ET:9: When implementing Logistic Regression with Regularization in Spark which of the following apply
+
+(a) When lambda equals one, it provides the same result as standard logistic regression  
+(b) One only needs to modify the standard logistic regression by modifying the Mapper   
+(c) Can be framed as minimizing a convex function
+(d) none of the above
+
+
+
+===== ET:10 In the context of ecommerce you have just deployed a new conversion rate prediction model to production. This model (aka treatment model) will challenge the control nodel (i.e., the current model) in AB Test manner to see if it can be produce better revenue. Here is the data that was taken from this live AB Test. 
+
+CONTROL MODEL (our new CTR model)
+Impression ID   Revenue  
+1                $0.50
+2                $0.50
+3                $3.00
+......               
+20000            $3.00
+20001            $3.00
+3                $3.00
+3                $3.00
+......
+50,001           $3.00
+.....
+100,000          $4.00
+
+All other impressions in this 100,000 sample resulted in zero transactions and therefore zero revenue. 
+
+TREATMENT MODEL (our new CTR model)
+Impression ID   Revenue  
+1                $1.50
+2                $0.50
+3                $0.00
+......
+50,001           $3.00
+.....
+100,000          $4.00
+
+All other impressions in this 100,000 sample resulted in zero transactions and therefore zero revenue. 
+
+
+P-values are a common way to determine the statistical significance of a test. The smaller it is, the more confident you can be that the test results are due to something other than random chance.
+A common p-value of .05 is a 5% significance level. Similarly, a p-value of .01 is a 1% significance level. A p-value of .20 is a 20% significance level. For this problem set the p-value to 0.01
+
+
+Which of the following are true:
+
+(a) Based on revenue there is no statistical significant difference between the Control and the Treatment at p-value of 0.05 for a one-sided t-test
+(b) Based on transaction rates (tranactions that generated revenue versus not) there is no statistical significant difference between the Control and the Treatment at p-value of 0.05 for a one-sided t-test
+
+(c) AB testing using differences in revenue for this problem is a  useful means of determining if the Treatment conversion rate prediction model is better than the control model.
+(d) none of the above
+
+
+
+===== ET:11 Given this graph expressed in the form of an adjacency list,
+
+Node  adjacentNode:weightAssociatedWithEdge
+N1    N6:10,  N2:2
+N2    N3:1
+N3    N4:1
+N4    N5:1
+N5    N6:1
+N6    N7:1
+N7    N8:1
+N8    N9:1
+
+Using the parallel breadth-first search algorithm for determining the shortest path from a single source, how many iterations are required to discover the shortest distances to all nodes from Node 1 
+
+A 7  
+B 8   
+C 13
+D None of the above
+
+
+
+===== ET:12 When parallelizing support vector machines and related algorithms in map-reduce frameworks, which of the following statements are true:
+
+(a) In the context of support vector machines, nonlinear kernels such as quadratic kernels can be readily parallelized in map reduce frameworks such as Spark
+(b) In the context of support vector machines, linear kernels can be readily parallelized in map reduce frameworks such as Spark
+(c) Sequential learning via algorithms such perceptron can take advantage of map-reduce frameworks and yield the same results as a single core implementation with significant reductions in training time
+(d) Field-aware Factorization Machines can easily distributed to take advantage of map-reduce frameworks
+
+
+
+===== ET:13 Given the following paired RDDs 
+RDD1 = {(1, 2), (3, 4), (3, 6)}
+RDD2 = {(3, 9) (3, 6)}
+
+Using PySpark, write code to perform an inner join of these paired RDDs. What is the resulting RDD? Make your Spark available in your notebook:
+
+A: [(3, (4, 9)), (3, (6, 9))]
+B: [(3, (4, 9)), (3, (4, 6)), (3, (6, 9)), (3, (6, 6))]
+C: [(3, (4, 9)), (3, (4, 6)), (3, (6, 9)), (3, (6, 9))]
+D: None of the above
+
+
+===== ET:14  You have been tasked to build a predictive model to forecast beer sales for a chain of stores.
+After doing basic exploratory analysis on the data, what is the first thing you do regarding modeling?
+
+
+(a) Construct a baseline model
+(b) Determine a metric to evaluate your machine learnt models
+(c) Split your data into training, validation and test subsets (or split using cross fold validatation)
+(d) All of the  of the above
+
+
+
+
+===== ET:15 
+Use Spark and the following notebook, https://www.dropbox.com/s/6s5ph41h74bggwi/Linear-Regression-on-Beer-Data.ipynb?dl=0 to answer this question.
+
+The mean absolute percentage error (MAPE), also known as mean absolute percentage deviation (MAPD), is a measure of prediction accuracy of a model for say a forecasting method in statistics, 
+for example in trend estimation. It usually expresses accuracy as a percentage, and is defined by the formula:
+
+MAPE = average over all examples (100*Abs(Actual - Predicted) / Actual)) 
+
+Note when Actual is zero that test row is dropped from the evaluation.
+
+Construct a mean model for target variable CASES18PK. Calculate the MAPE for the mean model over the training set. Select the closest answer.
+
+(a) 200%
+(b) 250%
+(c) 20%
+(d) 180%
+
+
+===== ET:16
+Use Spark and the following notebook, https://www.dropbox.com/s/6s5ph41h74bggwi/Linear-Regression-on-Beer-Data.ipynb?dl=0 to answer this question.
+
+The target variable CASES18PK is skewed, so take the log of it (and make it more normally distributed) and compute the MAPE of the mean model for CASES18PK
+Select the closest answer to your calculated MAPE.
+
+(a) 200%
+(b) 30%
+(c) 20%
+(d) 10%
+
+
+
+===== ET:17
+Use Spark and the following notebook, https://www.dropbox.com/s/6s5ph41h74bggwi/Linear-Regression-on-Beer-Data.ipynb?dl=0 to answer this question.
+
+Build a linear regression model using the following variables:
+
+Log(CASES18PK)  ~  log(PRICE12PK), 	log(PRICE18PK),	log(PRICE30PK)
+
+Calculate MAPE over the test set and select the closest answer.
+
+(a) 4.3%
+(b) 4.6%
+(c) 3.5%
+(d) 3.9%
+
+
+===== ET:18
+Recall that Spark automatically sends all variables referenced in your closures to the
+worker nodes. While this is convenient, it can also be inefficient because (1) the
+default task launching mechanism is optimized for small task sizes, and (2) you
+might, in fact, use the same variable in multiple parallel operations, but Spark will
+send it separately for each operation. As an example, say that we wanted to write a
+Spark program that looks up countries by their call signs (e.g., the call sign for Ireland is EJZ) by prefix matching in an
+table. In the following the "signPrefixes" variable is essentially a table with two columns "Sign" and "Country Name". The goal is 
+to join the following tables:
+
+     signPrefixes table with columns "Sign" and "Country Name"
+     contactCounts table with columns "Sign" and "count"
+
+     to yield  a new table:
+
+countryContactCounts with the following columns "Country Name" and "count"
+
+Use Spark and the following notebook, https://www.dropbox.com/s/6s5ph41h74bggwi/Linear-Regression-on-Beer-Data.ipynb?dl=0 to answer this question.
+
+#..... Other code...
+#Country lookup code
+
+# Helper functions for looking up the call signs
+
+ def lookupCountry(sign, prefixes):
+    pos = bisect.bisect_left(prefixes, sign)
+    return prefixes[pos].split(",")[1]
+
+
+def loadCallSignTable():
+    f = open("callsign_tbl_sorted.txt", "r")
+    return f.readlines()
+
+# Lookup the locations of the call signs on the
+# RDD contactCounts. We load a list of call sign
+# prefixes to country code to support this lookup.
+signPrefixes = loadCallSignTable()
+
+
+def processSignCount(sign_count, signPrefixes):
+    country = lookupCountry(sign_count[0], signPrefixes)
+    count = sign_count[1]
+    return (country, count)
+
+countryContactCounts = (contactCounts
+                        .map(lambda signCount: processSignCount(signCount, signPrefixes))
+                        .reduceByKey((lambda x, y: x + y)))
+
+countryContactCounts.saveAsTextFile(outputDir + "/countries.txt")
+
+How can we modfify this code to make it more efficient? Choose one response only
+
+(a) modify line 18 with sc.broadcast(loadCallSignTable())
+(b) Use accumulators to store the counts for each country
+(c) The code is already optimal
+(d) none of the above is correct
+
+End of exam
