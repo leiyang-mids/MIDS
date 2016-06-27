@@ -1,0 +1,129 @@
+{
+  "facility": {
+    "properties": {
+      "npi": {"encode": 0, "type": "string"},
+      "plans": {
+        "properties": {
+          "quantity_limit": {"encode": 0, "type": "boolean"},
+          "plan_id": {"encode": 0, "type": "string"},
+          "plan_id_type": {"encode": 0, "type": "string"},
+          "step_therapy": {"encode": 0, "type": "boolean"},
+          "prior_authorization": {"encode": 0, "type": "boolean"},
+          "network_tier": {"encode": 0, "type": "string"},
+          "drug_tier": {"encode": 0, "type": "string"}
+        }
+      },
+      "facility_name": {"encode": 0, "type": "string"},
+      "facility_type": {"encode": 0, "type": "string"},
+      "last_updated_on": {"encode": 0, "type": "date"},
+      "type": {"encode": 0, "type": "string"},
+      "addresses": {
+        "properties": {
+          "city": {"encode": 0, "type": "string"},
+          "zip": {"encode": 0, "type": "string"},
+          "phone": {"encode": 0, "type": "string"},
+          "state": {"encode": 0, "type": "string"},
+          "address_2": {"encode": 0, "type": "string"},
+          "address": {"encode": 0, "type": "string"}
+        }
+      }
+    }
+  },
+
+  "plan": {
+    "properties": {
+      "marketing_name": {"encode": 0, "type": "string"},
+      "network": {
+        "properties": {
+          "network_tier": {"encode": 1, "type": "string"}
+        }
+      },
+      "formulary": {
+        "properties": {
+          "drug_tier": {"encode": 1, "type": "string"},
+          "mail_order": {"encode": 1, "type": "boolean"},
+          "cost_sharing": {
+            "properties": {
+              "coinsurance_opt": {"encode": 1, "type": "string"},
+              "copay_amount": {"encode": 1, "type": "float"},
+              "copay_opt": {"encode": 1, "type": "string"},
+              "coinsurance_rate": {"encode": 1, "type": "float"},
+              "pharmacy_type": {"encode": 1, "type": "string"}
+            }
+          }
+        }
+      },
+      "plan_id_type": {"encode": 1, "type": "string"},
+      "last_updated_on": {"encode": 0, "type": "date"},
+      "summary_url": {"encode": 0, "type": "string"},
+      "formulary_url": {"encode": 0, "type": "string"},
+      "benefits": {"encode": 0, "type": "object"},
+      "plan_contact": {"encode": 0, "type": "string"},
+      "plan_id": {"encode": 1, "type": "string"},
+      "marketing_url": {"encode": 0, "type": "string"}
+    }
+  },
+
+  "drug": {
+    "properties": {
+      "drug_name": {"encode": 0, "type": "string"},
+      "rxnorm_id": {"encode": 0, "type": "integer"},
+      "plans": {
+        "properties": {
+          "quantity_limit": {"encode": 1, "type": "boolean"},
+          "plan_id": {"encode": 1, "type": "string"},
+          "plan_id_type": {"encode": 0, "type": "string"},
+          "step_therapy": {"encode": 1, "type": "boolean"},
+          "prior_authorization": {"encode": 1, "type": "boolean"},
+          "network_tier": {"encode": 0, "type": "string"},
+          "drug_tier": {"encode": 1, "type": "string"}
+        }
+      }
+    }
+  },
+
+  "provider": {
+    "properties": {
+      "npi": {"encode": 0, "type": "string"},
+      "name": {
+        "properties": {
+          "middle": {"encode": 0, "type": "string"},
+          "prefix": {"encode": 0, "type": "string"},
+          "last": {"encode": 0, "type": "string"},
+          "suffix": {"encode": 0, "type": "string"},
+          "first": {"encode": 0, "type": "string"}
+        }
+      },
+      "gender": {"encode": 0, "type": "string"},
+      "facility_name": {"encode": 0, "type": "string"},
+      "specialty": {"encode": 0, "type": "string"},
+      "facility_type": {"encode": 0, "type": "string"},
+      "languages": {"encode": 0, "type": "string"},
+      "plans": {
+        "properties": {
+          "quantity_limit": {"encode": 0, "type": "boolean"},
+          "plan_id": {"encode": 0, "type": "string"},
+          "plan_id_type": {"encode": 0, "type": "string"},
+          "step_therapy": {"encode": 0, "type": "boolean"},
+          "prior_authorization": {"encode": 0, "type": "boolean"},
+          "network_tier": {"encode": 0, "type": "string"},
+          "drug_tier": {"encode": 0, "type": "string"}
+        }
+      },
+      "accepting": {"encode": 0, "type": "string"},
+      "last_updated_on": {"encode": 0, "type": "date"},
+      "type": {"encode": 0, "type": "string"},
+      "addresses": {
+        "properties": {
+          "city": {"encode": 0, "type": "string"},
+          "zip": {"encode": 0, "type": "string"},
+          "phone": {"encode": 0, "type": "string"},
+          "state": {"encode": 0, "type": "string"},
+          "address_2": {"encode": 0, "type": "string"},
+          "address": {"encode": 0, "type": "string"}
+        }
+      }
+    }
+  }
+
+}
