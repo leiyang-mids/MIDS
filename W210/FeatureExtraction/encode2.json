@@ -59,7 +59,7 @@
       "formulary_url": {"encode": 0, "type": "string"},
       "benefits": {"encode": 0, "type": "object"},
       "plan_contact": {"encode": 0, "type": "string"},
-      "plan_id": {"encode": 1, "type": "string"},
+      "plan_id": {"encode": 0, "type": "string"},
       "marketing_url": {"encode": 0, "type": "string"}
     }
   },
@@ -71,7 +71,7 @@
       "plans": {
         "properties": {
           "quantity_limit": {"encode": 1, "type": "boolean"},
-          "plan_id": {"encode": 1, "type": "string"},
+          "plan_id": {"encode": 0, "type": "string"},
           "plan_id_type": {"encode": 0, "type": "string"},
           "step_therapy": {"encode": 1, "type": "boolean"},
           "prior_authorization": {"encode": 1, "type": "boolean"},
