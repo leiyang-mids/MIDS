@@ -60,8 +60,6 @@ def getFormularyStatesForPlan2(plan_collection, plans):
                         'ti':'$formulary.drug_tier',
                         'mo':'$formulary.mail_order',
                         'ph':'$formulary.costSharing.pharmacyType',
-                        # 'cp':'$formulary.costSharing.copay_opt',
-                        # 'ci':'$formulary.costSharing.coinsurance_opt',
                         'nt':'$network.network_tier',
                     },
                     'cnt':{'$sum':1},
@@ -75,8 +73,6 @@ def getFormularyStatesForPlan2(plan_collection, plans):
                             {'$cond':[{'$or':[{'$eq':['$_id.ti',None]},{'$eq':['$_id.ti','']}]},'NA','$_id.ti']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.ph',None]},{'$eq':['$_id.ph','']}]},'NA','$_id.ph']},'|',
                             'NA|NA|', # no copay_opt and coinsurance_opt for this type of plan, so put NA instead
-                            # {'$cond':[{'$or':[{'$eq':['$_id.cp',None]},{'$eq':['$_id.cp','']}]},'NA','$_id.cp']},'|',
-                            # {'$cond':[{'$or':[{'$eq':['$_id.ci',None]},{'$eq':['$_id.ci','']}]},'NA','$_id.ci']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.nt',None]},{'$eq':['$_id.nt','']}]},'NA','$_id.nt']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.mo',None]},{'$eq':['$_id.mo','']}]},'NA',
                                     {'$cond':[{'$eq':['$_id.mo',True]},'Y','N']}]},
@@ -97,7 +93,6 @@ def getFormularyStatesForPlan3(plan_collection, plans):
         [
             {'$match':{'plan_id':{'$in':plans},'formulary.costSharing':{'$exists':False},'formulary.cost_sharing':{'$exists':False}}},
             {'$unwind':'$formulary'},
-            # {'$unwind':'$formulary.costSharing'},
             {'$unwind':'$network'},
             # still use a group stage so the context can collapse into key
             {'$group':{
@@ -105,9 +100,6 @@ def getFormularyStatesForPlan3(plan_collection, plans):
                         'pl':'$plan_id',
                         'ti':'$formulary.drug_tier',
                         'mo':'$formulary.mail_order',
-                        # 'ph':'$formulary.costSharing.pharmacyType',
-                        # 'cp':'$formulary.costSharing.copay_opt',
-                        # 'ci':'$formulary.costSharing.coinsurance_opt',
                         'nt':'$network.network_tier',
                     },
                     'cnt':{'$sum':1},
@@ -119,10 +111,7 @@ def getFormularyStatesForPlan3(plan_collection, plans):
                     'plan_state':{
                         '$concat':[
                             {'$cond':[{'$or':[{'$eq':['$_id.ti',None]},{'$eq':['$_id.ti','']}]},'NA','$_id.ti']},'|',
-                            # {'$cond':[{'$or':[{'$eq':['$_id.ph',None]},{'$eq':['$_id.ph','']}]},'NA','$_id.ph']},'|',
                             'NA|NA|NA|', # no copay_opt and coinsurance_opt for this type of plan, so put NA instead
-                            # {'$cond':[{'$or':[{'$eq':['$_id.cp',None]},{'$eq':['$_id.cp','']}]},'NA','$_id.cp']},'|',
-                            # {'$cond':[{'$or':[{'$eq':['$_id.ci',None]},{'$eq':['$_id.ci','']}]},'NA','$_id.ci']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.nt',None]},{'$eq':['$_id.nt','']}]},'NA','$_id.nt']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.mo',None]},{'$eq':['$_id.mo','']}]},'NA',
                                     {'$cond':[{'$eq':['$_id.mo',True]},'Y','N']}]},
@@ -137,50 +126,6 @@ def getFormularyStatesForPlan3(plan_collection, plans):
     )
 
 # get plan state - unique combinations of drug_tier/pharmacy_type/copay_opt/coinsurance_opt from all plans
-def getFormularyAllStates2(plan_collection, plans):
-    if type(plans) is str:
-        plans = [plans]
-    states = []
-    for p in plan_collection.aggregate(
-        [
-            {'$match':{'plan_id':{'$in':plans}, 'formulary.costSharing':{'$exists':True}}},
-            {'$unwind':'$formulary'},
-            {'$unwind':'$formulary.costSharing'},
-            {'$unwind':'$network'},
-            # group context from all plans
-            {'$group':{
-                    '_id':{
-                        'ti':'$formulary.drug_tier',
-                        'mo':'$formulary.mail_order',
-                        'ph':'$formulary.costSharing.pharmacyType',
-                        # 'cp':'$formulary.cost_sharing.copay_opt',
-                        # 'ci':'$formulary.cost_sharing.coinsurance_opt',
-                        'nt':'$network.network_tier',
-                    },
-                }
-            },
-            {'$project':{
-                    '_id':0,
-                    'plan_state':{
-                        '$concat':[
-                            {'$cond':[{'$or':[{'$eq':['$_id.ti',None]},{'$eq':['$_id.ti','']}]},'NA','$_id.ti']},'|',
-                            {'$cond':[{'$or':[{'$eq':['$_id.ph',None]},{'$eq':['$_id.ph','']}]},'NA','$_id.ph']},'|',
-                            'NA|NA|',
-                            # {'$cond':[{'$or':[{'$eq':['$_id.cp',None]},{'$eq':['$_id.cp','']}]},'NA','$_id.cp']},'|',
-                            # {'$cond':[{'$or':[{'$eq':['$_id.ci',None]},{'$eq':['$_id.ci','']}]},'NA','$_id.ci']},'|',
-                            {'$cond':[{'$or':[{'$eq':['$_id.nt',None]},{'$eq':['$_id.nt','']}]},'NA','$_id.nt']},'|',
-                            {'$cond':[{'$or':[{'$eq':['$_id.mo',None]},{'$eq':['$_id.mo','']}]},'NA',
-                                    {'$cond':[{'$eq':['$_id.mo',True]},'Y','N']}]},
-                        ]
-                    },
-                }
-            },
-            {'$group':{'_id':None, 'count':{'$addToSet':'$count'}, 'all_states':{'$addToSet':'$plan_state'}}},
-        ]
-    ):
-        states = p['all_states']
-    return states
-
 def getFormularyAllStates1(plan_collection, plans):
     if type(plans) is str:
         plans = [plans]
@@ -224,24 +169,22 @@ def getFormularyAllStates1(plan_collection, plans):
         states = p['all_states']
     return states
 
-def getFormularyAllStates3(plan_collection, plans):
+def getFormularyAllStates2(plan_collection, plans):
     if type(plans) is str:
         plans = [plans]
     states = []
     for p in plan_collection.aggregate(
         [
-            {'$match':{'plan_id':{'$in':plans}, 'formulary.cost_sharing':{'$exists':False}, 'formulary.costSharing':{'$exists':False}}},
+            {'$match':{'plan_id':{'$in':plans}, 'formulary.costSharing':{'$exists':True}}},
             {'$unwind':'$formulary'},
-            # {'$unwind':'$formulary.cost_sharing'},
+            {'$unwind':'$formulary.costSharing'},
             {'$unwind':'$network'},
             # group context from all plans
             {'$group':{
                     '_id':{
                         'ti':'$formulary.drug_tier',
                         'mo':'$formulary.mail_order',
-                        # 'ph':'$formulary.cost_sharing.pharmacy_type',
-                        # 'cp':'$formulary.cost_sharing.copay_opt',
-                        # 'ci':'$formulary.cost_sharing.coinsurance_opt',
+                        'ph':'$formulary.costSharing.pharmacyType',
                         'nt':'$network.network_tier',
                     },
                 }
@@ -251,9 +194,44 @@ def getFormularyAllStates3(plan_collection, plans):
                     'plan_state':{
                         '$concat':[
                             {'$cond':[{'$or':[{'$eq':['$_id.ti',None]},{'$eq':['$_id.ti','']}]},'NA','$_id.ti']},'|',
-                            # {'$cond':[{'$or':[{'$eq':['$_id.ph',None]},{'$eq':['$_id.ph','']}]},'NA','$_id.ph']},'|',
-                            # {'$cond':[{'$or':[{'$eq':['$_id.cp',None]},{'$eq':['$_id.cp','']}]},'NA','$_id.cp']},'|',
-                            # {'$cond':[{'$or':[{'$eq':['$_id.ci',None]},{'$eq':['$_id.ci','']}]},'NA','$_id.ci']},'|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.ph',None]},{'$eq':['$_id.ph','']}]},'NA','$_id.ph']},'|',
+                            'NA|NA|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.nt',None]},{'$eq':['$_id.nt','']}]},'NA','$_id.nt']},'|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.mo',None]},{'$eq':['$_id.mo','']}]},'NA',
+                                    {'$cond':[{'$eq':['$_id.mo',True]},'Y','N']}]},
+                        ]
+                    },
+                }
+            },
+            {'$group':{'_id':None, 'count':{'$addToSet':'$count'}, 'all_states':{'$addToSet':'$plan_state'}}},
+        ]
+    ):
+        states = p['all_states']
+    return states
+
+def getFormularyAllStates3(plan_collection, plans):
+    if type(plans) is str:
+        plans = [plans]
+    states = []
+    for p in plan_collection.aggregate(
+        [
+            {'$match':{'plan_id':{'$in':plans}, 'formulary.cost_sharing':{'$exists':False}, 'formulary.costSharing':{'$exists':False}}},
+            {'$unwind':'$formulary'},
+            {'$unwind':'$network'},
+            # group context from all plans
+            {'$group':{
+                    '_id':{
+                        'ti':'$formulary.drug_tier',
+                        'mo':'$formulary.mail_order',
+                        'nt':'$network.network_tier',
+                    },
+                }
+            },
+            {'$project':{
+                    '_id':0,
+                    'plan_state':{
+                        '$concat':[
+                            {'$cond':[{'$or':[{'$eq':['$_id.ti',None]},{'$eq':['$_id.ti','']}]},'NA','$_id.ti']},'|',                            
                             'NA|NA|NA|',
                             {'$cond':[{'$or':[{'$eq':['$_id.nt',None]},{'$eq':['$_id.nt','']}]},'NA','$_id.nt']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.mo',None]},{'$eq':['$_id.mo','']}]},'NA',
