@@ -70,6 +70,7 @@ def getProviderStateForPlans(provider_collection, plans):
                     ]},
                     'count':'$cnt',
                     'location':'$loc',
+                    # 'location':{'$cond':[{'$eq':['$loc',None]},0,'$loc']}                    
                 }
             },
             {'$group':{
