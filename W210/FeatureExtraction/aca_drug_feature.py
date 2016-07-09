@@ -30,7 +30,7 @@ def getDrugAggregateAllStates(drug_collection, plans):
                 }
             },
             {'$group':{'_id':None, 'state':{'$addToSet':'$drug_state'}}},
-        ]
+        ], allowDiskUse=True
     ):
         states = d['state']
     return states
@@ -45,7 +45,7 @@ def getDrugListForPlans(drug_collection, plans):
             {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$group':{'_id':'$plans.plan_id', 'drugs': {'$addToSet':'$rxnorm_id'}}},
             {'$project':{'plan':'$_id', 'drug':'$drugs', '_id':0 }},
-        ]
+        ], allowDiskUse=True
     )
 
 
@@ -85,5 +85,5 @@ def getDrugAggregateCountForPlans(drug_collection, plans):
             },
             {'$group':{'_id':'$pid', 'state':{'$push':{'key':'$drug_state','cnt':'$count'}}}},
             {'$project':{'plan':'$_id', 'drug_state':'$state', '_id':0}}
-        ]
+        ], allowDiskUse=True
     )

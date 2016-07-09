@@ -41,7 +41,7 @@ def getFormularyStatesForPlan1(plan_collection, plans):
             },
             {'$group':{'_id':'$plan', 'count':{'$addToSet':'$count'}, 'plan_states':{'$addToSet':'$plan_state'}}},
             {'$sort':{'plan':1}}
-        ]
+        ], allowDiskUse=True
     )
 
 def getFormularyStatesForPlan2(plan_collection, plans):
@@ -83,7 +83,7 @@ def getFormularyStatesForPlan2(plan_collection, plans):
             },
             {'$group':{'_id':'$plan', 'count':{'$addToSet':'$count'}, 'plan_states':{'$addToSet':'$plan_state'}}},
             {'$sort':{'plan':1}}
-        ]
+        ], allowDiskUse=True
     )
 
 def getFormularyStatesForPlan3(plan_collection, plans):
@@ -122,7 +122,7 @@ def getFormularyStatesForPlan3(plan_collection, plans):
             },
             {'$group':{'_id':'$plan', 'count':{'$addToSet':'$count'}, 'plan_states':{'$addToSet':'$plan_state'}}},
             {'$sort':{'plan':1}}
-        ]
+        ], allowDiskUse=True
     )
 
 # get plan state - unique combinations of drug_tier/pharmacy_type/copay_opt/coinsurance_opt from all plans
@@ -164,7 +164,7 @@ def getFormularyAllStates1(plan_collection, plans):
                 }
             },
             {'$group':{'_id':None, 'count':{'$addToSet':'$count'}, 'all_states':{'$addToSet':'$plan_state'}}},
-        ]
+        ], allowDiskUse=True
     ):
         states = p['all_states']
     return states
@@ -204,7 +204,7 @@ def getFormularyAllStates2(plan_collection, plans):
                 }
             },
             {'$group':{'_id':None, 'count':{'$addToSet':'$count'}, 'all_states':{'$addToSet':'$plan_state'}}},
-        ]
+        ], allowDiskUse=True
     ):
         states = p['all_states']
     return states
@@ -231,7 +231,7 @@ def getFormularyAllStates3(plan_collection, plans):
                     '_id':0,
                     'plan_state':{
                         '$concat':[
-                            {'$cond':[{'$or':[{'$eq':['$_id.ti',None]},{'$eq':['$_id.ti','']}]},'NA','$_id.ti']},'|',                            
+                            {'$cond':[{'$or':[{'$eq':['$_id.ti',None]},{'$eq':['$_id.ti','']}]},'NA','$_id.ti']},'|',
                             'NA|NA|NA|',
                             {'$cond':[{'$or':[{'$eq':['$_id.nt',None]},{'$eq':['$_id.nt','']}]},'NA','$_id.nt']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.mo',None]},{'$eq':['$_id.mo','']}]},'NA',
@@ -241,7 +241,7 @@ def getFormularyAllStates3(plan_collection, plans):
                 }
             },
             {'$group':{'_id':None, 'count':{'$addToSet':'$count'}, 'all_states':{'$addToSet':'$plan_state'}}},
-        ]
+        ], allowDiskUse=True
     ):
         states = p['all_states']
     return states
@@ -272,5 +272,5 @@ def getFormularyAggregate(plan_collection, plans):
                 }
             },
             {'$sort':{'plan':1}}
-        ]
+        ], allowDiskUse=True
     )

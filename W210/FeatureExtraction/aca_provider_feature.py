@@ -29,7 +29,7 @@ def getProviderAllStates(provider_collection, plans):
                 }
             },
             {'$group':{'_id':None, 'states':{'$addToSet':'$prov_state'}}},
-        ]
+        ], allowDiskUse=True
     ):
         states = p['states']
     return states
@@ -64,7 +64,7 @@ def getProviderStateForPlans(provider_collection, plans):
                             {'$cond':[{'$or':[{'$eq':['$_id.ty',None]},{'$eq':['$_id.ty','']}]},'NA','$_id.ty']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.ac',None]},{'$eq':['$_id.ac','']}]},'NA','$_id.ac']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.lg',None]},{'$eq':['$_id.lg','']}]},'NA','$_id.lg']},'|',
-                            {'$cond':[{'$or':[{'$eq':['$_id.pn',None]},{'$eq':['$_id.pn','']}]},'NA','$_id.pn']},                            
+                            {'$cond':[{'$or':[{'$eq':['$_id.pn',None]},{'$eq':['$_id.pn','']}]},'NA','$_id.pn']},
                     ]},
                     'count':'$cnt',
                     'location':'$loc',
@@ -76,7 +76,7 @@ def getProviderStateForPlans(provider_collection, plans):
                     'plan_states':{'$push':{'key':'$prov_state','count':'$count','location':'$location'}}
                 }
             },
-        ]
+        ], allowDiskUse=True
     )
 
 
@@ -89,5 +89,5 @@ def getProviderListForPlans(provider_collection, plans):
             {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$group':{'_id':'$plans.plan_id', 'providers': {'$addToSet':'$npi'}}},
             {'$project':{'plan':'$_id', 'npi':'$providers', '_id':0 }},
-        ]
+        ], allowDiskUse=True
     )
