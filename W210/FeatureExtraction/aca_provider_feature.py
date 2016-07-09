@@ -25,7 +25,6 @@ def getProviderAllStates(provider_collection, plans):
                             {'$cond':[{'$or':[{'$eq':['$_id.ac',None]},{'$eq':['$_id.ac','']}]},'NA','$_id.ac']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.lg',None]},{'$eq':['$_id.lg','']}]},'NA','$_id.lg']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.pn',None]},{'$eq':['$_id.pn','']}]},'NA','$_id.pn']},
-                            # '|','$_id.ty','|','$_id.ac','|','$_id.lg','|','$_id.pn'
                     ]},
                 }
             },
@@ -65,12 +64,11 @@ def getProviderStateForPlans(provider_collection, plans):
                             {'$cond':[{'$or':[{'$eq':['$_id.ty',None]},{'$eq':['$_id.ty','']}]},'NA','$_id.ty']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.ac',None]},{'$eq':['$_id.ac','']}]},'NA','$_id.ac']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.lg',None]},{'$eq':['$_id.lg','']}]},'NA','$_id.lg']},'|',
-                            {'$cond':[{'$or':[{'$eq':['$_id.pn',None]},{'$eq':['$_id.pn','']}]},'NA','$_id.pn']},
-                            # '$_id.sp','|','$_id.ty','|','$_id.ac','|','$_id.lg','|','$_id.pn'
+                            {'$cond':[{'$or':[{'$eq':['$_id.pn',None]},{'$eq':['$_id.pn','']}]},'NA','$_id.pn']},                            
                     ]},
                     'count':'$cnt',
                     'location':'$loc',
-                    # 'location':{'$cond':[{'$eq':['$loc',None]},0,'$loc']}                    
+                    # 'location':{'$cond':[{'$eq':['$loc',None]},0,'$loc']}
                 }
             },
             {'$group':{
