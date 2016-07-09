@@ -2,6 +2,7 @@
 def getDrugAggregateAllStates(drug_collection, plans):
     for d in drug_collection.aggregate(
         [
+            {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$unwind':'$plans'},
             {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$group':{
@@ -37,8 +38,9 @@ def getDrugAggregateAllStates(drug_collection, plans):
 
 def getDrugListForPlans(drug_collection, plans):
     '''get rxnorm_id list for a group of plans'''
-    return drug_col.aggregate(
+    return drug_collection.aggregate(
         [
+            {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$unwind':'$plans'},
             {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$group':{'_id':'$plans.plan_id', 'drugs': {'$addToSet':'$rxnorm_id'}}},
@@ -51,6 +53,7 @@ def getDrugListForPlans(drug_collection, plans):
 def getDrugAggregateCountForPlans(drug_collection, plans):
     return drug_collection.aggregate(
         [
+            {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$unwind':'$plans'},
             {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$group':{

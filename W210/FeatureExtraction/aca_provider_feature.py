@@ -2,7 +2,7 @@
 def getProviderAllStates(provider_collection, plans):
     for p in provider_collection.aggregate(
         [
-            {'$match':{'facility_name':{'$exists':False}}},
+            {'$match':{'plans.plan_id':{'$in':plans}, 'facility_name':{'$exists':False}}},
             {'$unwind':'$plans'},
             {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$unwind':'$speciality'},
@@ -20,7 +20,12 @@ def getProviderAllStates(provider_collection, plans):
             {'$project':{
                     '_id':0,
                     'prov_state':{'$concat':[
-                            '$_id.sp','|','$_id.ty','|','$_id.ac','|','$_id.lg','|','$_id.pn'
+                            {'$cond':[{'$or':[{'$eq':['$_id.sp',None]},{'$eq':['$_id.sp','']}]},'NA','$_id.sp']},'|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.ty',None]},{'$eq':['$_id.ty','']}]},'NA','$_id.ty']},'|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.ac',None]},{'$eq':['$_id.ac','']}]},'NA','$_id.ac']},'|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.lg',None]},{'$eq':['$_id.lg','']}]},'NA','$_id.lg']},'|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.pn',None]},{'$eq':['$_id.pn','']}]},'NA','$_id.pn']},
+                            # '|','$_id.ty','|','$_id.ac','|','$_id.lg','|','$_id.pn'
                     ]},
                 }
             },
@@ -34,7 +39,7 @@ def getProviderAllStates(provider_collection, plans):
 def getProviderStateForPlans(provider_collection, plans):
     return provider_collection.aggregate(
         [
-            {'$match':{'facility_name':{'$exists':False}}},
+            {'$match':{'plans.plan_id':{'$in':plans}, 'facility_name':{'$exists':False}}},
             {'$unwind':'$plans'},
             {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$unwind':'$speciality'},
@@ -56,7 +61,12 @@ def getProviderStateForPlans(provider_collection, plans):
                     '_id':0,
                     'plan':'$_id.pl',
                     'prov_state':{'$concat':[
-                            '$_id.sp','|','$_id.ty','|','$_id.ac','|','$_id.lg','|','$_id.pn'
+                            {'$cond':[{'$or':[{'$eq':['$_id.sp',None]},{'$eq':['$_id.sp','']}]},'NA','$_id.sp']},'|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.ty',None]},{'$eq':['$_id.ty','']}]},'NA','$_id.ty']},'|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.ac',None]},{'$eq':['$_id.ac','']}]},'NA','$_id.ac']},'|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.lg',None]},{'$eq':['$_id.lg','']}]},'NA','$_id.lg']},'|',
+                            {'$cond':[{'$or':[{'$eq':['$_id.pn',None]},{'$eq':['$_id.pn','']}]},'NA','$_id.pn']},
+                            # '$_id.sp','|','$_id.ty','|','$_id.ac','|','$_id.lg','|','$_id.pn'
                     ]},
                     'count':'$cnt',
                     'location':'$loc',
@@ -75,6 +85,7 @@ def getProviderStateForPlans(provider_collection, plans):
 def getProviderListForPlans(provider_collection, plans):
     return provider_collection.aggregate(
         [
+            {'$match':{'plans.plan_id':{'$in':plans}, 'facility_name':{'$exists':False}}},
             {'$unwind':'$plans'},
             {'$match':{'plans.plan_id':{'$in':plans}}},
             {'$group':{'_id':'$plans.plan_id', 'providers': {'$addToSet':'$npi'}}},
