@@ -22,7 +22,6 @@ class letor_online:
         '''
         # TODO: data uniformity check
 
-
         self.learnt_query = learnt_query
         self.n_query = len(learnt_query)
         self.plan_ranks = plan_ranks
@@ -64,6 +63,3 @@ class letor_online:
         sum_sim = sum(similarity.getcol(i).data[0] for i in index)
         weights = [similarity.getcol(i).data[0]/sum_sim for i in index]
         return {pid:sum(rank[i]*w for i,w in zip(index,weights)) for pid,rank in self.plan_ranks.items()}
-
-    def features(self):
-        return self.characterizer.vocabulary_
