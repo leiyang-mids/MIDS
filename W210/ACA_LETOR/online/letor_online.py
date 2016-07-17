@@ -20,7 +20,7 @@ class letor_online:
         plan_ranks [m:1xn]: a dictionary with m key-value pairs;
                             key is plan_id, value is a [1xn] list of plan weight for each query
         '''
-        # uniformity check
+        # TODO: data uniformity check
 
 
         self.learnt_query = learnt_query
@@ -43,38 +43,26 @@ class letor_online:
 
         # encode the query, if it's orthogonal to all learnt queries, no ranking
         vQuery = self.characterizer.transform([query])
-        print 'vQuery', vQuery.toarray()[0]
-
-        # no similar query, return None
         if vQuery.data.size == 0:
             print 'No similar query is found, no ranking from LETOR'
             return None
 
-        # set all values to 1 of encoded query
+        # set all values to 1 of encoded query (don't care duplicate terms in query)
         for i in range(vQuery.data.size):
             vQuery.data[i] = 1
-        print 'vQuery', vQuery.toarray()[0]
 
         # find the most similar query, by cosine distance
         similarity = normalize(vQuery.astype(np.float)).dot(self.normalize_query.T)
-        print 'similarity', similarity.toarray()[0]
         candidates = similarity > self.similarity_limit
-        print 'candidates', candidates
-        n_candidate = sum(candidates.toarray()[0])
-        if n_candidate == 0:
+        if sum(candidates.data) == 0:
             # if no one above limit, return the synthesized ranking from the closest queries
-            max_sim = max(similarity.data)
-            candidates = similarity == max_sim
-            print 'candidates', candidates
-            n_candidate = sum(candidates.toarray()[0])
+            candidates = similarity == max(similarity.data)
 
-        print 'return %d closest match with similarity index: %.4f' %(n_candidate, max_sim)
+        # synthesize rank to return
         index = [i for i in range(self.n_query) if candidates.getcol(i)]
-        print 'index',index
+        print 'return %d closest match query with index: %s' %(len(index), str(index))
         sum_sim = sum(similarity.getcol(i).data[0] for i in index)
-        print 'sum_sim', sum_sim
         weights = [similarity.getcol(i).data[0]/sum_sim for i in index]
-        print 'weights', weights
         return {pid:sum(rank[i]*w for i,w in zip(index,weights)) for pid,rank in self.plan_ranks.items()}
 
     def features(self):
