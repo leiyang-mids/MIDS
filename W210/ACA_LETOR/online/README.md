@@ -13,10 +13,10 @@
 
 ###runtime data
 - located at s3: https://s3.amazonaws.com/w210.data/online/runtime_data_SS.pickle
-- replace _SS_ with state abbreviation, e.g. OR, NJ etc.
+- data is saved separately for each state, replace _SS_ in above link with state abbreviation, e.g. OR, NJ etc.
 - each file contain two variables for **letor_online** class initialization:
  - queries: list of queries learned for the plans
- - plan_ranks: plan ranking information
+ - plan_ranks: plan ranking information for each query
 
 ###example
     savedData = 'runtime_data_OR.pickle'
