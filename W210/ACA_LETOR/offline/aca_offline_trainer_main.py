@@ -10,7 +10,16 @@ def main():
 			if datetime.now() > next_run:
 				next_run += timedelta(hours0=interval)
 				# main procedure starts here
-				print 'test', str(datetime.now())
+				print 'get query and click data '
+
+				print 'group sessions by state'
+
+				print 'characterize queries for each state'
+
+				print 'run letor training for each state'
+
+				print 'save result on s3, for ES indexing'
+				
 		except KeyboardInterrupt:
 			sys.exit('User termination')
 		except Exception as ex:

@@ -36,11 +36,12 @@ def get_rank_for_state_plan(query_cluster, click_data):
     print 'load %d plans from feature data with dimension %d' %(n_plan, n_fea)
 
     # for each query cluster
+    print 'training started for %d query clusters' %(np.max(query_cluster)+1)
     p_index = {p:plans.index(p) for p in plans}
     letor_rank = []
     for c in np.unique(query_cluster):
         print '\ngetting training data from cluster %d with %d queries' %(c, sum(query_cluster==c))
-        fea_mat, tgt_vec = lil_matrix((1, n_fea)), []
+        fea_mat, tgt_vec = [], []
         # assemble training points from its queries
         for q in click_data[query_cluster==c]:
             # loop through each click to get training pairs
@@ -52,19 +53,16 @@ def get_rank_for_state_plan(query_cluster, click_data):
                 for i in range(c_index):
                     if i in click_indice:
                         continue
-                    fea_mat = vstack([fea_mat,
-                                      ( (feature.getrow(p_index[q[0][c_index]]) - feature.getrow(p_index[q[0][i]]))
-                                      if i%2==0 else
-                                      (feature.getrow(p_index[q[0][i]]) - feature.getrow(p_index[q[0][c_index]])) )
-                                     ], format='lil')
+                    fea_mat.append( (feature.getrow(p_index[q[0][c_index]]) - feature.getrow(p_index[q[0][i]]))
+                                     if i%2==0 else (feature.getrow(p_index[q[0][i]]) - feature.getrow(p_index[q[0][c_index]])) )
                     tgt_vec.append((-1)**i)
-        print '\nstart training with %d pair features' %len(tgt_vec)
-        # get rid of the first row, then  train SVM
-        fea_mat = csr_matrix(fea_mat[range(1, fea_mat.shape[0]), :])
-        clf = svm.SVC(kernel='linear', C=.1, max_iter=10*len(tgt_vec))
-        clf.fit(fea_mat, tgt_vec)
-        # coef = clf.coef_.toarray()[0]
-        print 'training completed, SVM coefficent %s' %(clf.coef_.shape)
-        letor_rank.append(clf.coef_.dot(feature.T))
+        print '\nstart training with %d pair features with %d +1' %(len(tgt_vec), sum(np.array(tgt_vec)==1))
+        clf = svm.SVC(kernel='linear', C=.2, max_iter=-1)
+        clf.fit(vstack(fea_mat, format='csr'), tgt_vec)
+        print 'training completed, obtain plan ranking'
+        r_weight = clf.coef_.dot(feature.T).toarray()[0]
+        r_min = np.min(r_weight)
+        r_range = np.max(r_weight) - r_min
+        letor_rank.append((r_weight-r_min)/r_range)
 
-    return letor_rank
+    return np.array(letor_rank)
