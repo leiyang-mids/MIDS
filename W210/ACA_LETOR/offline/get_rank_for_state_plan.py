@@ -1,7 +1,8 @@
 from sets import Set
-import pickle, glob
 from scipy.sparse import *
 from sklearn import svm
+import pickle, glob
+import numpy as np
 
 
 def get_rank_for_state_plan(query_cluster, click_data):
@@ -14,7 +15,7 @@ def get_rank_for_state_plan(query_cluster, click_data):
     '''
 
     # get state info from click data
-    state_ids = Set(s[5:7] for j in click_data for s in j[0])
+    state_ids = list(Set(s[5:7] for j in click_data for s in j[0]))
     state = state_ids[0]
     if len(state_ids) > 1:
         print 'warning: click data has plans from multiple states, training for ' + state
@@ -32,17 +33,21 @@ def get_rank_for_state_plan(query_cluster, click_data):
     with open(testData) as f:
         feature, plans = pickle.load(f)
     n_plan, n_fea = feature.shape
+    print 'load %d plans from feature data with dimension %d' %(n_plan, n_fea)
 
     # for each query cluster
     p_index = {p:plans.index(p) for p in plans}
     letor_rank = []
     for c in np.unique(query_cluster):
+        print '\ngetting training data from cluster %d with %d queries' %(c, sum(query_cluster==c))
         fea_mat, tgt_vec = lil_matrix((1, n_fea)), []
         # assemble training points from its queries
         for q in click_data[query_cluster==c]:
             # loop through each click to get training pairs
-            click_indice = [q[0].index(p) for p in q[1]]
+            click_indice = [np.where(q[0]==p)[0][0] for p in q[1]]
+            print 'query has %d clicks' %(len(q[1]))
             for c_index in click_indice:
+                print 'extracting feature for clicked plan %s' %q[0][c_index]
                 # loop through all items before current clicked item
                 for i in range(c_index):
                     if i in click_indice:
@@ -53,11 +58,13 @@ def get_rank_for_state_plan(query_cluster, click_data):
                                       (feature.getrow(p_index[q[0][i]]) - feature.getrow(p_index[q[0][c_index]])) )
                                      ], format='lil')
                     tgt_vec.append((-1)**i)
+        print '\nstart training with %d pair features' %len(tgt_vec)
         # get rid of the first row, then  train SVM
         fea_mat = csr_matrix(fea_mat[range(1, fea_mat.shape[0]), :])
-        clf = svm.SVC(kernel='linear', C=.1)
+        clf = svm.SVC(kernel='linear', C=.1, max_iter=10*len(tgt_vec))
         clf.fit(fea_mat, tgt_vec)
         # coef = clf.coef_.toarray()[0]
+        print 'training completed, SVM coefficent %s' %(clf.coef_.shape)
         letor_rank.append(clf.coef_.dot(feature.T))
 
     return letor_rank
