@@ -1,17 +1,12 @@
-from sklearn.preprocessing import OneHotEncoder
-from pymongo import MongoClient, DESCENDING
-from zipfile import ZipFile, ZIP_DEFLATED
-from scipy.sparse import *
-from scipy import stats
-from sklearn import svm
-from sets import Set
+from pymongo import MongoClient
+from s3_helpers import *
 import numpy as np
-import json, sys, os, time, re, datetime, itertools, pickle
 
 def main():
     '''
     main procedure to extract features for all states
     '''
+
     # connect to MongoDB and get collections
     m_url = 'ec2-54-153-83-172.us-west-1.compute.amazonaws.com'
     client = MongoClient(m_url, 27017)
@@ -29,9 +24,15 @@ def main():
         try:
             state_plan = [i for i in all_plan if state in i]
             print 'processing %d plans for %s' %(len(state_plan), state)
-            extract_state_feature(state_plan, plan_col, drug_col, prov_col)
+            plan, feature = get_state_feature(state_plan, plan_col, drug_col, prov_col)
+            print 'completed feature extraction for %d plans, with dimension %s' %(len(plan), str(feature.shape))
+            # savee pickle to s3
+            save_name = 'feature/%s_%d_%d.pickle' %(state, feature.shape[0], feature.shape[1])
+            with open(save_name, 'w') as f:
+                pickle.dump([feature, plan], f)
+            s3_helper().upload(save_name)
         except Exception as ex:
-
+            traceback.print_exc()
             print 'feature extraction has encountered error for state %s' %state
 
 

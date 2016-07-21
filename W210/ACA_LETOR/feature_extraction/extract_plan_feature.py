@@ -4,31 +4,28 @@ from scipy.sparse import *
 def extract_plan_feature(plan_col, plan_ids):
     '''
     '''
-    fea_mat, n_plan = [], len(plan_ids)
+    fea_mat = []
     print 'get formulary state space for all plans'
     all_plan_states = getFormularyAllStates1(plan_col, plan_ids) + \
                       getFormularyAllStates2(plan_col, plan_ids) + \
                       getFormularyAllStates3(plan_col, plan_ids)
-    print 'total formulary states: %d' %(len(all_plan_states))
+    n_state = len(all_plan_states)
+    print 'total formulary states: %d' %n_state
 
     print 'extract formulary states for each plan'
-    plan_feature = lil_matrix((n_plan, len(all_plan_states)))
-    valid_plan1 = []
+    plan_feature = {}
     for f in [getFormularyStatesForPlan1,getFormularyStatesForPlan2,getFormularyStatesForPlan3]:
         for p in f(plan_col, plan_ids):
-            r_id = plan_ids.index(p['_id'])
-            valid_plan1.append(p['_id'])
+            p_row = lil_matrix(1, n_state)
             for s in p['plan_states']:
-                plan_feature[r_id, all_plan_states.index(s)] = 1
+                p_row[0, all_plan_states.index(s)] = 1
+            plan_feature[p['_id']] = p_row
     fea_mat.append(plan_feature)
-    print 'complete for %d plans' %(len(valid_plan1))
+    print 'complete for %d plans' %(len(plan_feature))
 
     print 'get formulary summary feature for each plan'
-    plan_sumstat = [[0]*3]*len(valid_plan1)
-    for p in getFormularyAggregate(plan_col, valid_plan1):
-        r_id = plan_ids.index(p['plan'])
-        plan_sumstat[r_id] = [p['avg_copay'],p['avg_ci_rate'],p['count']]
+    plan_sumstat = {p['plan']:[p['avg_copay'],p['avg_ci_rate'],p['count']] for p in getFormularyAggregate(plan_col, plan_ids)}
     fea_mat.append(plan_sumstat)
-    print 'complete for %d plans' %(len(valid_plan1))
+    print 'complete for %d plans' %(len(plan_sumstat))
 
     return fea_mat

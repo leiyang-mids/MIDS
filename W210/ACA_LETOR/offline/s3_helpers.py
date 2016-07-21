@@ -26,7 +26,7 @@ class s3_helper:
             print 'no feature pickle found for state %s' %state
             return None
 
-    def upload_training_pickle(self, key):
+    def upload(self, key):
         '''
         upload plan rank for query clusters
         '''
