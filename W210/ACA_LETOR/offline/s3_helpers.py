@@ -31,3 +31,6 @@ class s3_helper:
         upload plan rank for query clusters
         '''
         self.bucket.upload_file(key, key)
+
+    def delete(self, key):
+        self.bucket.delete(key)

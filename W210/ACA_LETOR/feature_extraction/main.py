@@ -20,6 +20,7 @@ def main():
     state_ids = np.unique([i[5:7] for i in all_plan])
     print 'find plan from %d states: %s' %(len(state_ids), ', '.join(state_ids))
     # run procedure for each state
+    failure = []
     for state in state_ids:
         try:
             state_plan = [i for i in all_plan if state in i]
@@ -31,10 +32,13 @@ def main():
             with open(save_name, 'w') as f:
                 pickle.dump([feature, plan], f)
             s3_helper().upload(save_name)
+            print 'feature pickle saved to s3, complete for %s' %state
         except Exception as ex:
             traceback.print_exc()
+            failure.append(state)
             print 'feature extraction has encountered error for state %s' %state
 
+    print 'feature extraction completed, faied for %d states: %s' %(len(failure), ', '.join(failure))
 
 if __name__ == "__main__":
 	main()

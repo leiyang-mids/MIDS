@@ -4,7 +4,7 @@ from get_query_clusters import *
 def query_characterizer(queries, similarity_limit = 0.9):
     '''
     queries - list of string for queries
-    return - list of integers to indicate cluster for each query
+    return  - list of integers to indicate cluster for each query
     '''
     # vectorize queries
     characterizer = CountVectorizer()
@@ -19,4 +19,3 @@ def query_characterizer(queries, similarity_limit = 0.9):
         clusters, avg_sim, centroids = get_query_clusters(encoded_query, k)
 
     return clusters, characterizer, centroids #, avg_sim, k
-    
