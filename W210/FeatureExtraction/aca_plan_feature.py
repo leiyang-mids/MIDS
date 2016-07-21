@@ -136,6 +136,7 @@ def getFormularyAllStates1(plan_collection, plans):
             {'$unwind':'$formulary'},
             {'$unwind':'$formulary.cost_sharing'},
             {'$unwind':'$network'},
+            {'$unwind':'$network.network_tier'},
             # group context from all plans
             {'$group':{
                     '_id':{
