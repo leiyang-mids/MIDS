@@ -6,7 +6,7 @@ def extract_drug_feature(drug_col, plan_ids):
     '''
     fea_mat = []
     print 'get all drugs covered by all plans'
-    all_rxnorm = drug_col.find({'plans.plan_id':{'$in':valid_plan1}}).distinct('rxnorm_id')
+    all_rxnorm = drug_col.find({'plans.plan_id':{'$in':plan_ids}}).distinct('rxnorm_id')
     n_rxnorm = len(all_rxnorm)
     print 'total rx: %d' %(n_rxnorm)
 
@@ -17,8 +17,9 @@ def extract_drug_feature(drug_col, plan_ids):
         for r in p['drug']:
             d_row[0, all_rxnorm.index(r)] = 1
         drug_coverage[p['plan']] = d_row
-    fea_mat.append(drug_coverage)
-    print 'complete for %d plans' %(len(drug_coverage))
+    if drug_coverage:
+        fea_mat.append(drug_coverage)
+        print 'complete for %d plans' %(len(drug_coverage))
 
     print 'get summary feature for drug'
     all_drug_states = getDrugAggregateAllStates(drug_col, plan_ids)
@@ -32,7 +33,8 @@ def extract_drug_feature(drug_col, plan_ids):
         for d in p['drug_state']:
             d_row[0, all_drug_states.index(d['key'])] = d['cnt']
         drug_sumstat[p['plan']] = d_row
-    fea_mat.append(drug_sumstat)
-    print 'complete for %d plans' %(len(drug_sumstat))
+    if drug_sumstat:
+        fea_mat.append(drug_sumstat)
+        print 'complete for %d plans' %(len(drug_sumstat))
 
     return fea_mat

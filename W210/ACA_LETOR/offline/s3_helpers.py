@@ -33,4 +33,10 @@ class s3_helper:
         self.bucket.upload_file(key, key)
 
     def delete(self, key):
-        self.bucket.delete(key)
+        for obj in self.bucket.objects.all():
+            if obj.key == key #'online/runtime_data_OR.pickle':
+                obj.delete()
+                return True
+        else:
+            print 'key %s not found' %key
+            return False

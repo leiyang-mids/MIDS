@@ -16,16 +16,18 @@ def extract_plan_feature(plan_col, plan_ids):
     plan_feature = {}
     for f in [getFormularyStatesForPlan1,getFormularyStatesForPlan2,getFormularyStatesForPlan3]:
         for p in f(plan_col, plan_ids):
-            p_row = lil_matrix(1, n_state)
+            p_row = lil_matrix((1, n_state))
             for s in p['plan_states']:
                 p_row[0, all_plan_states.index(s)] = 1
             plan_feature[p['_id']] = p_row
-    fea_mat.append(plan_feature)
-    print 'complete for %d plans' %(len(plan_feature))
+    if plan_feature:
+        fea_mat.append(plan_feature)
+        print 'complete for %d plans' %(len(plan_feature))
 
     print 'get formulary summary feature for each plan'
     plan_sumstat = {p['plan']:[p['avg_copay'],p['avg_ci_rate'],p['count']] for p in getFormularyAggregate(plan_col, plan_ids)}
-    fea_mat.append(plan_sumstat)
-    print 'complete for %d plans' %(len(plan_sumstat))
+    if plan_sumstat:
+        fea_mat.append(plan_sumstat)
+        print 'complete for %d plans' %(len(plan_sumstat))
 
     return fea_mat

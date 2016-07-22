@@ -4,7 +4,7 @@ import pickle
 def simulate_clicks(n_query = 8):
     ''''''
 
-    savedData = 'UT_74_19243.pickle'
+    savedData = 'feature/UT_74_19243.pickle'
     with open(savedData) as f:
         feature, plan = pickle.load(f)
     plan=np.array(plan)

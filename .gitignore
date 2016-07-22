@@ -24,3 +24,5 @@ MIDS-W271/
 *.pyc
 
 w261_project/
+
+*.pickle
