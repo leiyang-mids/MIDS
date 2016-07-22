@@ -20,27 +20,29 @@ def get_click_data():
     click_type = [('plan_id',str), ('epoch',float)]
     click_rtn = []
     for sid, state, health, click, rank in records:
-        # get plan ranks and clicks
-        plans = [tuple(r.split(',')) for r in rank.split('|')]
-        clicks = [tuple(c.split(',')) for c in click.split('|')]
-        # parse out timestamp
-        for p in plans:
-            p[1] = time.mktime(time.strptime(p[1],'%Y-%m-%d %H:%M:%S.%f'))
-        for c in clicks:
-            c[1] = time.mktime(time.strptime(c[1],'%Y-%m-%d %H:%M:%S.%f'))
+        # get plan ranks and clicks, and parse out timestamp
+        plans, clicks = [], []
+        for r in rank.split('|'):
+            _r = r.split(',')
+            _r[1] = time.mktime(time.strptime(_r[1],'%Y-%m-%d %H:%M:%S.%f'))
+            plans.append(tuple(_r))
+        for c in clicks.split('|'):
+            _c = c.split(',')
+            _c[1] = time.mktime(time.strptime(_c[1],'%Y-%m-%d %H:%M:%S.%f'))
+            clicks.append(tuple(_c))
         # sort timestamp to get click order
-        p_click = [c['plan_id'] for c in np.sort(np.array(clicks, click_type), order=['epoch'])]
+        p_click = [c['plan_id'] for c in np.sort(np.array(clicks, dtype=click_type), order=['epoch'])]
         # check timestamp block for page, then sort on score to get plan order
-        plans = np.sort(np.array(plans, plan_type), order=['epoch'])
-        pages = np.zeros(len(plans))
+        plans = np.sort(np.array(plans, dtype=plan_type), order=['epoch'])
+        pages, p_rank = np.zeros(len(plans)), []
         for i in range(1, len(plans)):
             pages[i] = pages[i-1] if plans[i]['epoch']-plans[i-1]['epoch']<page_interval else pages[i-1]+1
-        p_rank = []
         for pg in np.unique(pages):
-            p_rank += [pl['plan_id'] for pl in np.sort(plans[pages==pg], order=['score', 'epoch'])[::-1]]
-        click_rtn.append([state, health, p_rank, p_click])
-
+            p_rank += [pl['plan_id'] for pl in np.sort(plans[pages==pg], order=['score','epoch'])[::-1]] # epoch order in question
+        # assemble the query info
+        click_rtn.append((state, health, p_rank, p_click))
+    # close connection and return
     cur.close()
     conn.close()
-
-    return click_rtn
+    rtn_type = [('state',str), ('query',str), ('ranks',list), ('clicks',list)]
+    return np.array(click_rtn, dtype=rtn_type)
