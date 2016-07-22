@@ -3,7 +3,7 @@ from get_state_feature import *
 from s3_helpers import *
 from logger import *
 import numpy as np
-import traceback
+import traceback, pickle
 
 def main():
     '''
@@ -47,6 +47,6 @@ def main():
     log.close()
     # put log on S3
     s3clnt.upload2(log.log_file(), 'log/'+log.log_file())
-
+    
 if __name__ == "__main__":
 	main()

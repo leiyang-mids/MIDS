@@ -34,6 +34,7 @@ class s3_helper:
 
     def upload2(self, src, des):
         self.bucket.upload_file(src, des)
+        self.set_public(des)
 
     def delete_by_key(self, key):
         for obj in self.bucket.objects.all():
@@ -47,7 +48,7 @@ class s3_helper:
     def delete_by_state(self, state):
         for obj in self.bucket.objects.all():
             if obj.key.startswith(key):
-                obj.delete()               
+                obj.delete()
 
     def set_public(self, key):
         '''
