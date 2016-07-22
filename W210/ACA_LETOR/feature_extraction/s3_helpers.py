@@ -53,7 +53,7 @@ class s3_helper:
     def set_public(self, key):
         '''
         '''
-        for obj in bucket.objects.all():
+        for obj in self.bucket.objects.all():
             if obj.key == key: # 'feature/SD_18_26728.pickle':
                 obj.Acl().put(ACL='public-read')
                 return True

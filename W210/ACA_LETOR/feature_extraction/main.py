@@ -36,7 +36,7 @@ def main():
                 pickle.dump([feature, plan], f)
             s3clnt.delete_by_state('feature/%s' %state)
             s3clnt.upload(save_name)
-            s3clnt.set_public(save_name)
+            # s3clnt.set_public(save_name)
             log.trace('feature pickle saved to s3, complete for %s' %state)
         except Exception as ex:
             traceback.print_exc(file=log.log_handler())
@@ -47,6 +47,6 @@ def main():
     log.close()
     # put log on S3
     s3clnt.upload2(log.log_file(), 'log/'+log.log_file())
-    
+
 if __name__ == "__main__":
 	main()
