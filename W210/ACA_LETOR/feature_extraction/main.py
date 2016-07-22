@@ -34,7 +34,7 @@ def main():
             save_name = 'feature/%s_%d_%d.pickle' %(state, feature.shape[0], feature.shape[1])
             with open(save_name, 'w') as f:
                 pickle.dump([feature, plan], f)
-            # s3clnt = s3_helper()
+            s3clnt.delete_by_state('feature/%s' %state)
             s3clnt.upload(save_name)
             s3clnt.set_public(save_name)
             log.trace('feature pickle saved to s3, complete for %s' %state)

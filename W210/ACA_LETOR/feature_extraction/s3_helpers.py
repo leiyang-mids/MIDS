@@ -35,7 +35,7 @@ class s3_helper:
     def upload2(self, src, des):
         self.bucket.upload_file(src, des)
 
-    def delete(self, key):
+    def delete_by_key(self, key):
         for obj in self.bucket.objects.all():
             if obj.key == key: #'online/runtime_data_OR.pickle':
                 obj.delete()
@@ -43,6 +43,11 @@ class s3_helper:
         else:
             print 'key %s not found' %key
             return False
+
+    def delete_by_state(self, state):
+        for obj in self.bucket.objects.all():
+            if obj.key.startswith(key):
+                obj.delete()               
 
     def set_public(self, key):
         '''

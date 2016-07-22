@@ -8,7 +8,8 @@ import numpy as np
 from simulate_clicks import *
 
 def main():
-	# execute cyclically
+	'''
+	'''
 	next_run, hour, minute = datetime.now(), 5, 10
 	global s3clnt, log = s3_helper(), logger('training')
 
@@ -20,20 +21,17 @@ def main():
 			# main procedure starts here
 			print 'get query and click data '
 			click_data = get_click_data()
-			print 'group sessions by state'
 			for state in np.unique(click_data['state']):
 				s_rows = click_data[click_data['state']==state]
-				print 'characterize queries for each state'
+				print 'characterize queries for the state'
 				q_cluster, q_characterizer, centroids = query_characterizer(s_rows)
-				print 'run letor training for each state'
-				# plans, q_cluster, clicks = simulate_clicks(8)
+				print 'run letor training for the state'
 				letor_rank = get_rank_for_state_plan(q_cluster, np.array([[r['ranks'],r['clicks']] for r in s_rows]))
 				print 'save result on s3, for ES indexing'
 				save_name = 'training/%s_%d.pickle' %(state, len(letor_rank))
 				with open(save_name, 'w') as f:
 					pickle.dump([plans, letor_rank], f)
-				# print '%s: feature matrix saved as %s' %(logTime(), saveName)
-				s3clnt = s3_helper()
+				s3clnt.delete_by_state('training/%s' %state)
 	            s3clnt.upload(save_name)
 	            s3clnt.set_public(save_name)
 			# training completed, get next run time
