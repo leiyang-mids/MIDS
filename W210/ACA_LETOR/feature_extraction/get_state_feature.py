@@ -2,7 +2,7 @@ from extract_provider_feature import *
 from extract_drug_feature import *
 from extract_plan_feature import *
 from sets import Set
-from scipy.sparse import *
+from scipy.sparse import vstack, hstack
 
 def get_state_feature(state_plan, plan, drug, provider):
     '''

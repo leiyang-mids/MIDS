@@ -2,6 +2,7 @@ from pymongo import MongoClient
 from s3_helpers import *
 from logger import *
 import numpy as np
+import traceback
 
 def main():
     '''
@@ -38,14 +39,14 @@ def main():
             s3clnt.set_public(save_name)
             log.trace('feature pickle saved to s3, complete for %s' %state)
         except Exception as ex:
-            traceback.print_exc(file=log.log_handler)
+            traceback.print_exc(file=log.log_handler())
             failure.append(state)
             log.error('feature extraction has encountered error for state %s' %state)
 
     log.trace('feature extraction completed, faied for %d states: %s' %(len(failure), ', '.join(failure)))
     log.close()
     # put log on S3
-    s3clnt.upload2(log.log_name, 'log/'+log.log_name)
+    s3clnt.upload2(log.log_name(), 'log/'+log.log_name())
 
 if __name__ == "__main__":
 	main()
