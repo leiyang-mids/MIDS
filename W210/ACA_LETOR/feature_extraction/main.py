@@ -31,7 +31,9 @@ def main():
             save_name = 'feature/%s_%d_%d.pickle' %(state, feature.shape[0], feature.shape[1])
             with open(save_name, 'w') as f:
                 pickle.dump([feature, plan], f)
-            s3_helper().upload(save_name)
+            s3clnt = s3_helper()
+            s3clnt.upload(save_name)
+            s3clnt.set_public(save_name)
             print 'feature pickle saved to s3, complete for %s' %state
         except Exception as ex:
             traceback.print_exc()

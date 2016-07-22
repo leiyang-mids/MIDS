@@ -25,13 +25,15 @@ def main():
 				letor_rank = get_rank_for_state_plan(q_cluster, clicks)
 
 				print 'save result on s3, for ES indexing'
-				saveName = 'training/%s_%d.pickle' %('UT', len(letor_rank))
+				save_name = 'training/%s_%d.pickle' %('UT', len(letor_rank))
 
-				with open(saveName, 'w') as f:
+				with open(save_name, 'w') as f:
 					pickle.dump([plans, letor_rank], f)
 
 				# print '%s: feature matrix saved as %s' %(logTime(), saveName)
-				s3_helper().upload(saveName)
+				s3clnt = s3_helper()
+	            s3clnt.upload(save_name)
+	            s3clnt.set_public(save_name)				
 				print 'next run time is %s' %str(next_run)
 
 		except KeyboardInterrupt:

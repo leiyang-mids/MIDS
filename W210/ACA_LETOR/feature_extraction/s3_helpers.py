@@ -40,3 +40,14 @@ class s3_helper:
         else:
             print 'key %s not found' %key
             return False
+
+    def set_public(self, key):
+        '''
+        '''
+        for obj in bucket.objects.all():
+            if obj.key == key: # 'feature/SD_18_26728.pickle':
+                obj.Acl().put(ACL='public-read')
+                return True
+        else:
+            print 'key %s not found' %key
+            return False
