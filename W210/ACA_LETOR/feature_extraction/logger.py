@@ -10,7 +10,7 @@ class logger:
     def __init__(self, log_type):
         # if self.log: self.log.close()
         self.log_name = '%s_%s' %(log_type, datetime.now().strftime('%Y%m%d%H%M%S'))
-        self.log = open(log_name, 'w')
+        self.log = open(self.log_name, 'w')
 
     def close(self):
         self.log.close()
@@ -27,5 +27,5 @@ class logger:
     def log_handler(self):
         return self.log
 
-    def log_name(self):
+    def log_file(self):
         return self.log_name

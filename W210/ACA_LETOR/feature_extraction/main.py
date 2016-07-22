@@ -1,4 +1,5 @@
 from pymongo import MongoClient
+from get_state_feature import *
 from s3_helpers import *
 from logger import *
 import numpy as np
@@ -8,10 +9,11 @@ def main():
     '''
     main procedure to extract features for all states
     '''
-    global log, s3clnt = logger('feature'), s3_helper()
+    global log, s3clnt
+    log, s3clnt = logger('feature'), s3_helper()
 
     # connect to MongoDB and get collections
-    m_url = 'ec2-54-153-83-172.us-west-1.compute.amazonaws.com'
+    m_url = 'ec2-52-53-230-141.us-west-1.compute.amazonaws.com'
     client = MongoClient(m_url, 27017)
     plan_col = client.plans.plans
     drug_col = client.formularies.drugs
@@ -27,7 +29,7 @@ def main():
     for state in state_ids:
         try:
             state_plan = [i for i in all_plan if state in i]
-            log.trace('\nprocessing %d plans for %s' %(len(state_plan), state))
+            log.trace('processing %d plans for %s' %(len(state_plan), state))
             plan, feature = get_state_feature(state_plan, plan_col, drug_col, prov_col)
             log.trace('completed feature extraction for %d plans, with dimension %s' %(len(plan), str(feature.shape)))
             # savee pickle to s3
@@ -46,7 +48,7 @@ def main():
     log.trace('feature extraction completed, faied for %d states: %s' %(len(failure), ', '.join(failure)))
     log.close()
     # put log on S3
-    s3clnt.upload2(log.log_name(), 'log/'+log.log_name())
+    s3clnt.upload2(log.log_file(), 'log/'+log.log_file())
 
 if __name__ == "__main__":
 	main()
