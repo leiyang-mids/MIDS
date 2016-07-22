@@ -1,7 +1,7 @@
 from query_plan_feature import *
 from scipy.sparse import *
 
-def extract_plan_feature(plan_col, plan_ids):
+def extract_plan_feature(plan_col, plan_ids, log):
     '''
     '''
     fea_mat = []

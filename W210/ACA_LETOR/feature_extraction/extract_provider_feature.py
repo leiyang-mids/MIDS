@@ -1,7 +1,7 @@
 from query_provider_feature import *
 from scipy.sparse import *
 
-def extract_provider_feature(prov_col, plan_ids):
+def extract_provider_feature(prov_col, plan_ids, log):
     '''
     '''
     fea_mat = []

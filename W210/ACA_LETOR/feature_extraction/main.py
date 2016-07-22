@@ -9,9 +9,7 @@ def main():
     '''
     main procedure to extract features for all states
     '''
-    global log, s3clnt
     log, s3clnt = logger('feature'), s3_helper()
-
     # connect to MongoDB and get collections
     m_url = 'ec2-52-53-230-141.us-west-1.compute.amazonaws.com'
     client = MongoClient(m_url, 27017)
@@ -30,7 +28,7 @@ def main():
         try:
             state_plan = [i for i in all_plan if state in i]
             log.trace('processing %d plans for %s' %(len(state_plan), state))
-            plan, feature = get_state_feature(state_plan, plan_col, drug_col, prov_col)
+            plan, feature = get_state_feature(state_plan, plan_col, drug_col, prov_col, log)
             log.trace('completed feature extraction for %d plans, with dimension %s' %(len(plan), str(feature.shape)))
             # savee pickle to s3
             save_name = 'feature/%s_%d_%d.pickle' %(state, feature.shape[0], feature.shape[1])

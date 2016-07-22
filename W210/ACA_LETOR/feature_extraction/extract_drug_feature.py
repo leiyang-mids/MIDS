@@ -1,7 +1,7 @@
 from query_drug_feature import *
 from scipy.sparse import *
 
-def extract_drug_feature(drug_col, plan_ids):
+def extract_drug_feature(drug_col, plan_ids, log):
     '''
     '''
     fea_mat = []

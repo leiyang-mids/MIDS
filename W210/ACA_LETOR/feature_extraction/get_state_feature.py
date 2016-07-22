@@ -4,7 +4,7 @@ from extract_plan_feature import *
 from sets import Set
 from scipy.sparse import vstack, hstack
 
-def get_state_feature(state_plan, plan, drug, provider):
+def get_state_feature(state_plan, plan, drug, provider, log):
     '''
     state_plan - plan IDs for the state
     plan       - MongoDB plan collection
@@ -12,9 +12,9 @@ def get_state_feature(state_plan, plan, drug, provider):
     provider   - MongoDB provider collection
     '''
     # extract features from plan, drug, and provider
-    fea_mat = extract_plan_feature(plan, state_plan)
-    fea_mat += extract_drug_feature(drug, state_plan)
-    fea_mat += extract_provider_feature(provider, state_plan)
+    fea_mat = extract_plan_feature(plan, state_plan, log)
+    fea_mat += extract_drug_feature(drug, state_plan, log)
+    fea_mat += extract_provider_feature(provider, state_plan, log)
 
     # get common keys (plan has all elements)
     valid_plan = Set(fea_mat[0].keys())
