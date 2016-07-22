@@ -21,6 +21,6 @@ def get_state_feature(state_plan, plan, drug, provider):
     for i in range(1, len(fea_mat)):
         valid_plan = valid_plan.intersection(fea_mat[i].keys())
     valid_plan = list(valid_plan)
-    
+
     # combine all elements for each plan and return
-    return valid_plan, csr_matrix([hstack([f[p] for f in fea_mat]) for p in valid_plan])
+    return valid_plan, vstack([hstack([f[p] for f in fea_mat]) for p in valid_plan], format='csr')
