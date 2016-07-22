@@ -1,11 +1,13 @@
 from pymongo import MongoClient
 from s3_helpers import *
+from logger import *
 import numpy as np
 
 def main():
     '''
     main procedure to extract features for all states
     '''
+    global log, s3clnt = logger('feature'), s3_helper()
 
     # connect to MongoDB and get collections
     m_url = 'ec2-54-153-83-172.us-west-1.compute.amazonaws.com'
@@ -14,33 +16,36 @@ def main():
     drug_col = client.formularies.drugs
     prov_col = client.providers.providers
     faci_col = client.providers.facilities
-    print 'connected to MongoDB at %s' %m_url
+    log.trace('connected to MongoDB at %s' %m_url)
     # parse out plan ID for states
     all_plan = drug_col.distinct('plans.plan_id')
     state_ids = np.unique([i[5:7] for i in all_plan])
-    print 'find plan from %d states: %s' %(len(state_ids), ', '.join(state_ids))
+    log.trace('find plan from %d states: %s' %(len(state_ids), ', '.join(state_ids)))
     # run procedure for each state
     failure = []
     for state in state_ids:
         try:
             state_plan = [i for i in all_plan if state in i]
-            print 'processing %d plans for %s' %(len(state_plan), state)
+            log.trace('\nprocessing %d plans for %s' %(len(state_plan), state))
             plan, feature = get_state_feature(state_plan, plan_col, drug_col, prov_col)
-            print 'completed feature extraction for %d plans, with dimension %s' %(len(plan), str(feature.shape))
+            log.trace('completed feature extraction for %d plans, with dimension %s' %(len(plan), str(feature.shape)))
             # savee pickle to s3
             save_name = 'feature/%s_%d_%d.pickle' %(state, feature.shape[0], feature.shape[1])
             with open(save_name, 'w') as f:
                 pickle.dump([feature, plan], f)
-            s3clnt = s3_helper()
+            # s3clnt = s3_helper()
             s3clnt.upload(save_name)
             s3clnt.set_public(save_name)
-            print 'feature pickle saved to s3, complete for %s' %state
+            log.trace('feature pickle saved to s3, complete for %s' %state)
         except Exception as ex:
-            traceback.print_exc()
+            traceback.print_exc(file=log.log_handler)
             failure.append(state)
-            print 'feature extraction has encountered error for state %s' %state
+            log.error('feature extraction has encountered error for state %s' %state)
 
-    print 'feature extraction completed, faied for %d states: %s' %(len(failure), ', '.join(failure))
+    log.trace('feature extraction completed, faied for %d states: %s' %(len(failure), ', '.join(failure)))
+    log.close()
+    # put log on S3
+    s3clnt.upload2(log.log_name, 'log/'+log.log_name)
 
 if __name__ == "__main__":
 	main()

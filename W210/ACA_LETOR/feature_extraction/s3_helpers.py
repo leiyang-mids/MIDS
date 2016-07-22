@@ -30,7 +30,10 @@ class s3_helper:
         '''
         upload plan rank for query clusters
         '''
-        self.bucket.upload_file(key, key)
+        self.bucket.upload_file(key)
+
+    def upload2(self, src, des):
+        self.bucket.upload_file(src, des)
 
     def delete(self, key):
         for obj in self.bucket.objects.all():

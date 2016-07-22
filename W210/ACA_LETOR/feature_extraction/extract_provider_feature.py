@@ -5,12 +5,12 @@ def extract_provider_feature(prov_col, plan_ids):
     '''
     '''
     fea_mat = []
-    print 'get provider under the plans'
+    log.trace('get provider under the plans')
     all_npi = prov_col.find({'plans.plan_id':{'$in':plan_ids}}).distinct('npi')
     n_npi = len(all_npi)
-    print 'total providers: %d' %n_npi
+    log.trace('total providers: %d' %n_npi)
 
-    print 'check provider coverage for each plan' ##### slow #####
+    log.trace('check provider coverage for each plan') ##### slow #####
     provider_coverage = {}
     for p in getProviderListForPlans(prov_col, plan_ids):
         p_row = lil_matrix((1, n_npi))
@@ -19,14 +19,14 @@ def extract_provider_feature(prov_col, plan_ids):
         provider_coverage[p['plan']] = p_row
     if provider_coverage:
         fea_mat.append(provider_coverage)
-        print 'complete for %d plans' %(len(provider_coverage))
+        log.trace('complete for %d plans' %(len(provider_coverage)))
 
-    print 'get summary feature for provider'
+    log.trace('get summary feature for provider')
     all_provider_states = getProviderAllStates(prov_col, plan_ids)
     n_prov = len(all_provider_states)
-    print 'total provider summary: %d' %(n_prov)
+    log.trace('total provider summary: %d' %(n_prov))
 
-    print 'extract provider sumstat for each plan'
+    log.trace('extract provider sumstat for each plan')
     provider_sumstat = {}
     for p in getProviderStateForPlans(prov_col, plan_ids):
         p_row = lil_matrix((1, n_prov))
@@ -35,6 +35,6 @@ def extract_provider_feature(prov_col, plan_ids):
         provider_sumstat[p['_id']] = p_row
     if provider_sumstat:
         fea_mat.append(provider_sumstat)
-        print 'complete for %d plans' %(len(provider_sumstat))
+        log.trace('complete for %d plans' %(len(provider_sumstat)))
 
     return fea_mat

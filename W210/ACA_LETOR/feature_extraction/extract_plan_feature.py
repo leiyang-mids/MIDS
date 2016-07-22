@@ -5,14 +5,14 @@ def extract_plan_feature(plan_col, plan_ids):
     '''
     '''
     fea_mat = []
-    print 'get formulary state space for all plans'
+    log.trace('get formulary state space for all plans')
     all_plan_states = getFormularyAllStates1(plan_col, plan_ids) + \
                       getFormularyAllStates2(plan_col, plan_ids) + \
                       getFormularyAllStates3(plan_col, plan_ids)
     n_state = len(all_plan_states)
-    print 'total formulary states: %d' %n_state
+    log.trace('total formulary states: %d' %n_state)
 
-    print 'extract formulary states for each plan'
+    log.trace('extract formulary states for each plan')
     plan_feature = {}
     for f in [getFormularyStatesForPlan1,getFormularyStatesForPlan2,getFormularyStatesForPlan3]:
         for p in f(plan_col, plan_ids):
@@ -22,12 +22,12 @@ def extract_plan_feature(plan_col, plan_ids):
             plan_feature[p['_id']] = p_row
     if plan_feature:
         fea_mat.append(plan_feature)
-        print 'complete for %d plans' %(len(plan_feature))
+        log.trace('complete for %d plans' %(len(plan_feature)))
 
-    print 'get formulary summary feature for each plan'
+    log.trace('get formulary summary feature for each plan')
     plan_sumstat = {p['plan']:[p['avg_copay'],p['avg_ci_rate'],p['count']] for p in getFormularyAggregate(plan_col, plan_ids)}
     if plan_sumstat:
         fea_mat.append(plan_sumstat)
-        print 'complete for %d plans' %(len(plan_sumstat))
+        log.trace('complete for %d plans' %(len(plan_sumstat)))
 
     return fea_mat
