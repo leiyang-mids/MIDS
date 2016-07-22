@@ -47,7 +47,7 @@ class s3_helper:
 
     def delete_by_state(self, state):
         for obj in self.bucket.objects.all():
-            if obj.key.startswith(key):
+            if obj.key.startswith(state):
                 obj.delete()
 
     def set_public(self, key):
