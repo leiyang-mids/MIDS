@@ -17,7 +17,7 @@ def getFormularyStatesForPlan1(plan_collection, plans):
                         'ph':'$formulary.cost_sharing.pharmacy_type',
                         'cp':'$formulary.cost_sharing.copay_opt',
                         'ci':'$formulary.cost_sharing.coinsurance_opt',
-                        'nt':'$network.network_tier',
+                        # 'nt':'$network.network_tier',
                     },
                     'cnt':{'$sum':1},
                 }
@@ -31,7 +31,7 @@ def getFormularyStatesForPlan1(plan_collection, plans):
                             {'$cond':[{'$or':[{'$eq':['$_id.ph',None]},{'$eq':['$_id.ph','']}]},'NA','$_id.ph']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.cp',None]},{'$eq':['$_id.cp','']}]},'NA','$_id.cp']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.ci',None]},{'$eq':['$_id.ci','']}]},'NA','$_id.ci']},'|',
-                            {'$cond':[{'$or':[{'$eq':['$_id.nt',None]},{'$eq':['$_id.nt','']}]},'NA','$_id.nt']},'|',
+                            # {'$cond':[{'$or':[{'$eq':['$_id.nt',None]},{'$eq':['$_id.nt','']}]},'NA','$_id.nt']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.mo',None]},{'$eq':['$_id.mo','']}]},'NA',
                                     {'$cond':[{'$eq':['$_id.mo',True]},'Y','N']}]},
                         ]
@@ -145,7 +145,7 @@ def getFormularyAllStates1(plan_collection, plans):
                         'ph':'$formulary.cost_sharing.pharmacy_type',
                         'cp':'$formulary.cost_sharing.copay_opt',
                         'ci':'$formulary.cost_sharing.coinsurance_opt',
-                        'nt':'$network.network_tier',
+                        # 'nt':'$network.network_tier',
                     },
                 }
             },
@@ -157,7 +157,7 @@ def getFormularyAllStates1(plan_collection, plans):
                             {'$cond':[{'$or':[{'$eq':['$_id.ph',None]},{'$eq':['$_id.ph','']}]},'NA','$_id.ph']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.cp',None]},{'$eq':['$_id.cp','']}]},'NA','$_id.cp']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.ci',None]},{'$eq':['$_id.ci','']}]},'NA','$_id.ci']},'|',
-                            {'$cond':[{'$or':[{'$eq':['$_id.nt',None]},{'$eq':['$_id.nt','']}]},'NA','$_id.nt']},'|',
+                            # {'$cond':[{'$or':[{'$eq':['$_id.nt',None]},{'$eq':['$_id.nt','']}]},'NA','$_id.nt']},'|',
                             {'$cond':[{'$or':[{'$eq':['$_id.mo',None]},{'$eq':['$_id.mo','']}]},'NA',
                                 {'$cond':[{'$eq':['$_id.mo',True]},'Y','N']}]},
                         ]
